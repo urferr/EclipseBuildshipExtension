@@ -2,6 +2,8 @@ package com.profidata.eclipse.buildship.enhancements.aspects;
 
 import java.util.Arrays;
 
+import org.gradle.tooling.model.eclipse.EclipseProject;
+
 import com.profidata.eclipse.buildship.enhancements.Activator;
 import com.profidata.eclipse.project.model.ProjectConstants;
 import com.profidata.eclipse.project.model.ProjectWrapper;
@@ -10,10 +12,7 @@ import com.profidata.eclipse.project.model.fix.IgnoreProjectFolder;
 import com.profidata.eclipse.project.model.fix.TestFragmentCreator;
 import org.aspectj.lang.annotation.SuppressAjWarnings;
 
-import com.gradleware.tooling.toolingmodel.OmniEclipseProject;
-
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.JavaCore;
 
@@ -27,8 +26,8 @@ public aspect SynchronizeGradleBuildOperationAspect {
 	 * @param theProgress
 	 */
 	@SuppressAjWarnings("adviceDidNotMatch")
-	void around(OmniEclipseProject theProject, IProject theWorkspaceProject, boolean theRefreshNeeded, SubMonitor theProgress):
-               execution(void org.eclipse.buildship.core.workspace.internal.SynchronizeGradleBuildOperation.synchronizeOpenWorkspaceProject(OmniEclipseProject, IProject, boolean, SubMonitor)) && 
+	void around(EclipseProject theProject, IProject theWorkspaceProject, boolean theRefreshNeeded, SubMonitor theProgress):
+               execution(void org.eclipse.buildship.core.workspace.internal.SynchronizeGradleBuildOperation.synchronizeOpenWorkspaceProject(EclipseProject, IProject, boolean, SubMonitor)) && 
                args(theProject,  theWorkspaceProject,  theRefreshNeeded, theProgress) {
 		// Ignore the gradle build folder for all projects because Eclipse IDE is not interested in these folders and their content
 		IgnoreProjectFolder.run(theWorkspaceProject, "target");
