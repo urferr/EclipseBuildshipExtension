@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Eclipse Buildship Enhancements
+Bundle-SymbolicName: com.profidata.eclipse.buildship.enhancements
+Bundle-Version: 0.1.0.qualifier
+Bundle-Activator: com.profidata.eclipse.buildship.enhancements.Activator
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: org.aspectj.runtime;bundle-version="1.7.0";visibility:=reexport
+Eclipse-SupplementBundle: org.eclipse.buildship.core, org.eclipse.core.resources
+Import-Package: com.google.common.collect,
+ com.gradleware.tooling.toolingmodel,
+ com.profidata.eclipse.project.model,
+ com.profidata.eclipse.project.model.fix,
+ org.eclipse.buildship.core.configuration,
+ org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.eclipse.jdt.core,
+ org.osgi.framework
+Export-Package: com.profidata.eclipse.buildship.enhancements.aspects;aspect-policy=opt-out;aspects="SynchronizeGradleBuildOperationAspect,ProjectNatureUpdaterAspect,GradleClasspathContainerUpdaterAspect,LaunchConfigurationManagerAspect"
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: Profidata AG
