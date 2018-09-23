@@ -1,10 +1,10 @@
 package com.profidata.eclipse.buildship.enhancements.aspects;
 
+import org.aspectj.lang.annotation.SuppressAjWarnings;
+import org.eclipse.core.resources.IProject;
+
 import com.profidata.eclipse.project.model.ProjectConstants;
 import com.profidata.eclipse.project.model.ProjectWrapper;
-import org.aspectj.lang.annotation.SuppressAjWarnings;
-
-import org.eclipse.core.resources.IProject;
 
 public aspect LaunchConfigurationManagerAspect {
 	/**
@@ -17,7 +17,7 @@ public aspect LaunchConfigurationManagerAspect {
           execution(public void org.eclipse.buildship.core.launch.internal.DefaultExternalLaunchConfigurationManager.updateClasspathProviders(IProject)) &&
           args(theProject) {
 		ProjectWrapper aProjectWrapper = ProjectWrapper.of(theProject);
-		
+
 		if (!aProjectWrapper.hasNature(ProjectConstants.PLUGIN_NATURE_ID))
 			proceed(theProject);
 	}

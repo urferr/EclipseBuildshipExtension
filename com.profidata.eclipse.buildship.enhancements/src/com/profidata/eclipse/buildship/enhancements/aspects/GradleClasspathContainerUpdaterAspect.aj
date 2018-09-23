@@ -3,14 +3,14 @@ package com.profidata.eclipse.buildship.enhancements.aspects;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import com.profidata.eclipse.project.model.ProjectConstants;
-import com.profidata.eclipse.project.model.ProjectWrapper;
 import org.aspectj.lang.annotation.SuppressAjWarnings;
-
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
+
+import com.profidata.eclipse.project.model.ProjectConstants;
+import com.profidata.eclipse.project.model.ProjectWrapper;
 
 public aspect GradleClasspathContainerUpdaterAspect {
 
@@ -25,7 +25,7 @@ public aspect GradleClasspathContainerUpdaterAspect {
               execution(private static void org.eclipse.buildship.core.workspace.internal.GradleClasspathContainerUpdater.setClasspathContainer(IJavaProject, List<IClasspathEntry>, IProgressMonitor)) && 
               args(theEclipseProject, theClasspathEntries, theMonitor) {
 		ProjectWrapper aProjectWrapper = ProjectWrapper.of(theEclipseProject.getProject());
-		
+
 		if (!aProjectWrapper.hasNature(ProjectConstants.PLUGIN_NATURE_ID)) {
 			proceed(theEclipseProject, theClasspathEntries, theMonitor);
 		}

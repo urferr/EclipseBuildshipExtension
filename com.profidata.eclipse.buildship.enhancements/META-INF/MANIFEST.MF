@@ -10,7 +10,7 @@ Eclipse-SupplementBundle: org.eclipse.buildship.core, org.eclipse.core.resources
 Import-Package: com.google.common.collect,
  com.profidata.eclipse.project.model,
  com.profidata.eclipse.project.model.fix,
- org.eclipse.buildship.core.configuration,
+ org.eclipse.buildship.core.internal.configuration,
  org.eclipse.core.resources,
  org.eclipse.core.runtime,
  org.eclipse.jdt.core,

@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.profidata.eclipse.project.model.ProjectConstants;
 import org.aspectj.lang.annotation.SuppressAjWarnings;
+import org.eclipse.buildship.core.internal.configuration.GradleProjectNature;
 
-import org.eclipse.buildship.core.configuration.GradleProjectNature;
+import com.profidata.eclipse.project.model.ProjectConstants;
+
 
 @SuppressWarnings("restriction")
 public aspect ProjectNatureUpdaterAspect {

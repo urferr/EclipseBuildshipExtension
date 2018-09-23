@@ -27,7 +27,7 @@ public aspect SynchronizeGradleBuildOperationAspect {
 	 */
 	@SuppressAjWarnings("adviceDidNotMatch")
 	void around(EclipseProject theProject, IProject theWorkspaceProject, boolean theRefreshNeeded, SubMonitor theProgress):
-               execution(void org.eclipse.buildship.core.workspace.internal.SynchronizeGradleBuildOperation.synchronizeOpenWorkspaceProject(EclipseProject, IProject, boolean, SubMonitor)) && 
+               execution(void org.eclipse.buildship.core.internal.workspace.SynchronizeGradleBuildOperation.synchronizeOpenWorkspaceProject(EclipseProject, IProject, boolean, SubMonitor)) && 
                args(theProject,  theWorkspaceProject,  theRefreshNeeded, theProgress) {
 		// Ignore the gradle build folder for all projects because Eclipse IDE is not interested in these folders and their content
 		IgnoreProjectFolder.run(theWorkspaceProject, "target");
