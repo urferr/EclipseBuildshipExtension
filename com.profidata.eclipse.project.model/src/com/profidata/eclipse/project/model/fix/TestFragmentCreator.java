@@ -78,11 +78,12 @@ public class TestFragmentCreator {
                 Activator.info(aProjectWrapper.getProtocolMessage());
             }
 
+            String aExecutionEnvironment = AdditionalProjectConfigurationDefinitions.findExecutionEnvironment(aTestProjectName);
             IPath aWorkspaceLocation = theProject.getWorkspace().getRoot().getLocation();
             aProjectWrapper.createProject().open().toJavaProject().removeDefaultSourceFolder().setOutputFolder("bin").addNature(ProjectConstants.PLUGIN_NATURE_ID)
                     .addBuilder("org.eclipse.pde.ManifestBuilder").addBuilder("org.eclipse.pde.SchemaBuilder")
                     .addClasspathEntry(theTestProject -> JavaCore
-                            .newContainerEntry(new Path("org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8")))
+                            .newContainerEntry(new Path("org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/"+aExecutionEnvironment)))
                     .addClasspathEntry(theTestProject -> JavaCore.newContainerEntry(ProjectConstants.PLUGIN_CLASSPATH));
 
             IPath aProjectLocation = theProject.getLocation();
@@ -96,8 +97,9 @@ public class TestFragmentCreator {
                 aProjectWrapper.addLinkedSourceFolder(aTestType + "-" + aSourceType, aSourceLocation);
             }
 
-            aProjectWrapper.createTestFragmentManifest(theProject, AdditionalProjectConfigurationDefinitions
-                    .findExecutionEnvironment(aTestProjectName), () -> aAdditionalConfig.additionalPackageDependencies, () -> Collections.emptySet(), Collections.emptyMap())
+            aProjectWrapper
+                    .createTestFragmentManifest(theProject, aExecutionEnvironment, () -> aAdditionalConfig.additionalPackageDependencies, () -> Collections.emptySet(), Collections
+                            .emptyMap())
                     .createBuildProperties().refresh();
 
             // Some of the Xentis projects have now set the encoding UTF-8 which is not the default.
