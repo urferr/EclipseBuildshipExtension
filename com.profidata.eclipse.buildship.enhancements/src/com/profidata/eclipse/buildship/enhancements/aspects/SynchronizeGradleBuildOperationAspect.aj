@@ -41,9 +41,16 @@ public aspect SynchronizeGradleBuildOperationAspect {
 
 		if (!aProjectWrapper.hasNature(ProjectConstants.PLUGIN_NATURE_ID)) {
 			proceed(theProject, theWorkspaceProject, theRefreshNeeded, theProgress);
+			
+			// The java plugin project was new and therefore has not yet been fixed
+			if (aProjectWrapper.hasNature(JavaCore.NATURE_ID) && aProjectWrapper.hasNature(ProjectConstants.PLUGIN_NATURE_ID)) {
+				aProjectWrapper.asJavaProject();
+				FixProjectDefinition.run(aProjectWrapper);
+			}
 		}
 
-		else {
+		// When a new project is imported, the plugin nature has not been set initially and therefore the proceed method has been executed
+		if (aProjectWrapper.hasNature(ProjectConstants.PLUGIN_NATURE_ID)) {
 			// if for any reason the gradle classpath container has already been added it will no be removed again.
 			aProjectWrapper.removeClasspathEntry(ProjectConstants.GRADLE_CLASSPATH);
 			

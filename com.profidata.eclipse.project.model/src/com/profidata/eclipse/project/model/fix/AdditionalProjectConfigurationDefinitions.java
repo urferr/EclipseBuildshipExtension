@@ -26,7 +26,6 @@ public class AdditionalProjectConfigurationDefinitions {
 
         public final String encoding;
         public final Set<String> additionalPackageDependencies = new HashSet<>();
-        public final Set<String> additionalProjectDependencies = new HashSet<>();
         public final Set<ClasspathEntry> additionalClasspathEntries = new HashSet<>();
 
         public ProjectConfiguration(String theEncoding) {
