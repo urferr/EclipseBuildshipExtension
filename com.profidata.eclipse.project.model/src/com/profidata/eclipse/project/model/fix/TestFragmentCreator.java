@@ -100,7 +100,7 @@ public class TestFragmentCreator {
             aProjectWrapper
                     .createTestFragmentManifest(theProject, aExecutionEnvironment, () -> aAdditionalConfig.additionalPackageDependencies, () -> Collections.emptySet(), Collections
                             .emptyMap())
-                    .createBuildProperties().refresh();
+                    .createBuildProperties(aAdditionalConfig.additionalBundles).refresh();
 
             // Some of the Xentis projects have now set the encoding UTF-8 which is not the default.
             // Therefore the corresponding test fragment should have the same encoding

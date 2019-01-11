@@ -3,8 +3,10 @@ package com.profidata.eclipse.project.model.fix;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,6 +29,8 @@ public class AdditionalProjectConfigurationDefinitions {
         public final String encoding;
         public final Set<String> additionalPackageDependencies = new HashSet<>();
         public final Set<ClasspathEntry> additionalClasspathEntries = new HashSet<>();
+
+        public final List<String> additionalBundles = new ArrayList<>();
 
         public ProjectConfiguration(String theEncoding) {
             this(theEncoding, null);
