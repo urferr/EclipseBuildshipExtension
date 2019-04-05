@@ -23,7 +23,6 @@ public class AdditionalProjectConfigurationDefinitions {
     public final Map<String, ProjectConfiguration> projectConfigurations = new HashMap<>();
 
     public static class ProjectConfiguration {
-
         private final String executionEnvironment;
 
         public final String encoding;
@@ -48,8 +47,8 @@ public class AdditionalProjectConfigurationDefinitions {
             Library, Project, Container
         }
 
-        final ClasspathEntryType type;
-        final String path;
+        public final ClasspathEntryType type;
+        public final String path;
         public final boolean exported;
         public final Set<AccessRule> accessRules = new HashSet<>();
 
@@ -65,7 +64,6 @@ public class AdditionalProjectConfigurationDefinitions {
     }
 
     public static class AccessRule {
-
         public final String pattern;
         public final int kind;
 
@@ -79,7 +77,7 @@ public class AdditionalProjectConfigurationDefinitions {
         AdditionalProjectConfigurationDefinitions allConfigurations = load();
         String aExecutionEnvironment = find(allConfigurations, theProjectName).executionEnvironment;
 
-        if (aExecutionEnvironment == null) {
+        if (aExecutionEnvironment == null && allConfigurations != null) {
             aExecutionEnvironment = allConfigurations.executionEnvironment;
         }
 
@@ -100,12 +98,17 @@ public class AdditionalProjectConfigurationDefinitions {
 
     private static AdditionalProjectConfigurationDefinitions load() {
         IPath aAdditionalProjectConfigurationPath = ResourcesPlugin.getWorkspace().getRoot().getLocation()
-                .append(System.getProperty("additional.project.configuration.path", "URRExtensions/PDE-Targets & Launcher")).append("AdditionProjectConfiguration.json");
+                .append(System.getProperty("extension.buildship.additional.project.configuration.path", ResourcesPlugin.getWorkspace().getRoot().getLocation().toString()))
+                .append("AdditionalProjectConfiguration.json");
 
-        try (Reader aReader = new FileReader(aAdditionalProjectConfigurationPath.toOSString())) {
-            return new Gson().fromJson(aReader, AdditionalProjectConfigurationDefinitions.class);
-        } catch (JsonIOException | IOException cause) {
-            Activator.error("could not read json file: " + aAdditionalProjectConfigurationPath.toOSString());
+        if (aAdditionalProjectConfigurationPath.toFile().exists()) {
+            try (Reader aReader = new FileReader(aAdditionalProjectConfigurationPath.toOSString())) {
+                return new Gson().fromJson(aReader, AdditionalProjectConfigurationDefinitions.class);
+            } catch (JsonIOException | IOException cause) {
+                Activator.error("could not read json file: " + aAdditionalProjectConfigurationPath.toOSString());
+            }
+        } else {
+            Activator.info("json file does not exist: " + aAdditionalProjectConfigurationPath.toOSString());
         }
 
         return null;
