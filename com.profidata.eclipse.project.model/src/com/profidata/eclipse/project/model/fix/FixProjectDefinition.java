@@ -4,8 +4,8 @@ import java.util.Set;
 
 import com.profidata.eclipse.project.model.Activator;
 import com.profidata.eclipse.project.model.ProjectWrapper;
-import com.profidata.eclipse.project.model.fix.AdditionalProjectConfigurationDefinitions.AccessRule;
-import com.profidata.eclipse.project.model.fix.AdditionalProjectConfigurationDefinitions.ProjectConfiguration;
+import com.profidata.eclipse.project.model.fix.AdditionalProjectConfigurations.AccessRule;
+import com.profidata.eclipse.project.model.fix.AdditionalProjectConfigurations.ProjectConfiguration;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -27,7 +27,7 @@ public class FixProjectDefinition {
 	private FixProjectDefinition(ProjectWrapper theProjectWrapper) {
 		this.projectWrapper = theProjectWrapper;
 		this.project = theProjectWrapper.getProject();
-		this.additionalConfiguration = AdditionalProjectConfigurationDefinitions.find(this.project.getName());
+		this.additionalConfiguration = AdditionalProjectConfigurationDefinitionProvider.getInstance().find(this.project.getName());
 	}
 
 	private void execute() {

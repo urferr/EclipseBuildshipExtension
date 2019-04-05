@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import com.profidata.eclipse.project.model.Activator;
 import com.profidata.eclipse.project.model.ProjectConstants;
 import com.profidata.eclipse.project.model.ProjectWrapper;
-import com.profidata.eclipse.project.model.fix.AdditionalProjectConfigurationDefinitions.ProjectConfiguration;
+import com.profidata.eclipse.project.model.fix.AdditionalProjectConfigurations.ProjectConfiguration;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
@@ -72,13 +72,13 @@ public class TestFragmentCreator {
 
         if (!aProjectWrapper.isExisting()) {
             Activator.info(" -> Create OSGi Test fragment project: " + aTestProjectName);
-            ProjectConfiguration aAdditionalConfig = AdditionalProjectConfigurationDefinitions.find(aTestProjectName);
+            ProjectConfiguration aAdditionalConfig = AdditionalProjectConfigurationDefinitionProvider.getInstance().find(aTestProjectName);
             ProjectWrapper.of(theProject).setSingletonPlugin(true);
             if (aProjectWrapper.hasProtocol()) {
                 Activator.info(aProjectWrapper.getProtocolMessage());
             }
 
-            String aExecutionEnvironment = AdditionalProjectConfigurationDefinitions.findExecutionEnvironment(aTestProjectName);
+            String aExecutionEnvironment = AdditionalProjectConfigurationDefinitionProvider.getInstance().findExecutionEnvironment(aTestProjectName);
             IPath aWorkspaceLocation = theProject.getWorkspace().getRoot().getLocation();
             aProjectWrapper.createProject().open().toJavaProject().removeDefaultSourceFolder().setOutputFolder("bin").addNature(ProjectConstants.PLUGIN_NATURE_ID)
                     .addBuilder("org.eclipse.pde.ManifestBuilder").addBuilder("org.eclipse.pde.SchemaBuilder")
