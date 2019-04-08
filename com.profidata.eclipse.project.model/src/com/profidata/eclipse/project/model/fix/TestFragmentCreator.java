@@ -60,6 +60,10 @@ public class TestFragmentCreator {
 
                 createTestProject(this.project, allTestSourceClasspathEntries);
             }
+
+            else {
+                updateTestProject(this.project);
+            }
         } catch (JavaModelException theCause) {
             Activator.error("Could not access class path of project '" + this.project.getName() + "': " + theCause.getMessage());
         }
@@ -121,5 +125,18 @@ public class TestFragmentCreator {
                 Activator.info(aProjectWrapper.getProtocolMessage());
             }
         }
+
+        FixProjectDefinition.run(aProjectWrapper);
+    }
+
+    private void updateTestProject(IProject theProject) {
+        IWorkspace aWorkspace = theProject.getWorkspace();
+        String aTestProjectName = theProject.getName() + ".test";
+        ProjectWrapper aProjectWrapper = ProjectWrapper.of(aWorkspace, aTestProjectName);
+
+        if (aProjectWrapper.isExisting()) {
+            Activator.info(" -> Update OSGi Test fragment project: " + aTestProjectName);
+            FixProjectDefinition.run(aProjectWrapper.toJavaProject());
+         }
     }
 }
