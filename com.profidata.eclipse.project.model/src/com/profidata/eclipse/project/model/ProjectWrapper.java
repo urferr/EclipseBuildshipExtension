@@ -659,6 +659,26 @@ public class ProjectWrapper {
         return this;
     }
 
+    public ProjectWrapper updateTestFragmentManifest(IProject theHostBundleProject, Supplier<Set<String>> theAdditionalPackageDependencies,
+            Supplier<Set<String>> theIgnorePackageDependencies, Map<String, String> theSpecialPackageDependencies) {
+        verifyJavaProject();
+
+        if (!hasError()) {
+            IFragmentModel aFragmentModel = new WorkspaceBundleFragmentModel(PDEProject.getManifest(this.project), PDEProject.getFragmentXml(this.project));
+            IBundlePluginModelBase aBundleModelBase = (IBundlePluginModelBase) aFragmentModel;
+
+            IBundle aBundle = aBundleModelBase.getBundleModel().getBundle();
+            ProjectWrapper aHostBundleProjectWrapper = ProjectWrapper.of(theHostBundleProject);
+
+            List<String> allSortedImportedPackages = determinePackagesToImport(aHostBundleProjectWrapper
+                    .getSourcePackages(), theAdditionalPackageDependencies, theIgnorePackageDependencies, theSpecialPackageDependencies);
+            addToImportPackageHeader(aBundle, allSortedImportedPackages);
+
+            aBundleModelBase.save();
+        }
+        return this;
+    }
+
     @SuppressWarnings({})
     public ProjectWrapper createTestFragmentPackageDependencies(IWorkspace theWorkspace, Supplier<Set<String>> theAdditionalPackageDependencies,
             Supplier<Set<String>> theIgnorePackageDependencies, Map<String, String> theSpecialPackageDependencies) {
@@ -750,7 +770,39 @@ public class ProjectWrapper {
                         try {
                             aAdditionalBundleBuildEntry.addToken(theAdditionalBundle);
                         } catch (CoreException theCause) {
-                            this.errorMessage = "Could add addition bundle '"+theAdditionalBundle+"' to build.properties file of bundle project '" + this.project.getName() + "': " + theCause.getMessage();
+                            this.errorMessage = "Could add addition bundle '" + theAdditionalBundle + "' to build.properties file of bundle project '" + this.project.getName()
+                                    + "': " + theCause.getMessage();
+                        }
+                    });
+
+                    aBuildModel.getBuild().add(aAdditionalBundleBuildEntry);
+                }
+
+                ((IEditableModel) aBuildModel).save();
+            } catch (CoreException theCause) {
+                this.errorMessage = "Could not build.properties file for bundle project '" + this.project.getName() + "': " + theCause.getMessage();
+            }
+        }
+        return this;
+    }
+    public ProjectWrapper updateBuildProperties(List<String> theAdditionalBundles) {
+        verifyJavaProject();
+
+        if (!hasError()) {
+            try {
+                IFile aBuildPropertiesFile = PDEProject.getBuildProperties(this.project);
+                WorkspaceBuildModel aBuildModel = new WorkspaceBuildModel(aBuildPropertiesFile);
+                IBuildModelFactory aBuildModelFactory = aBuildModel.getFactory();
+
+                if (theAdditionalBundles != null && !theAdditionalBundles.isEmpty()) {
+                    IBuildEntry aAdditionalBundleBuildEntry = aBuildModelFactory.createEntry(IBuildEntry.SECONDARY_DEPENDENCIES);
+
+                    theAdditionalBundles.forEach(theAdditionalBundle -> {
+                        try {
+                            aAdditionalBundleBuildEntry.addToken(theAdditionalBundle);
+                        } catch (CoreException theCause) {
+                            this.errorMessage = "Could add addition bundle '" + theAdditionalBundle + "' to build.properties file of bundle project '" + this.project.getName()
+                                    + "': " + theCause.getMessage();
                         }
                     });
 

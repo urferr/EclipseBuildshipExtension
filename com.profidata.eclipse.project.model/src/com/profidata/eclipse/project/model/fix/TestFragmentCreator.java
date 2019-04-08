@@ -86,8 +86,8 @@ public class TestFragmentCreator {
             IPath aWorkspaceLocation = theProject.getWorkspace().getRoot().getLocation();
             aProjectWrapper.createProject().open().toJavaProject().removeDefaultSourceFolder().setOutputFolder("bin").addNature(ProjectConstants.PLUGIN_NATURE_ID)
                     .addBuilder("org.eclipse.pde.ManifestBuilder").addBuilder("org.eclipse.pde.SchemaBuilder")
-                    .addClasspathEntry(theTestProject -> JavaCore
-                            .newContainerEntry(new Path("org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/"+aExecutionEnvironment)))
+                    .addClasspathEntry(theTestProject -> JavaCore.newContainerEntry(new Path(
+                            "org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/" + aExecutionEnvironment)))
                     .addClasspathEntry(theTestProject -> JavaCore.newContainerEntry(ProjectConstants.PLUGIN_CLASSPATH));
 
             IPath aProjectLocation = theProject.getLocation();
@@ -136,7 +136,12 @@ public class TestFragmentCreator {
 
         if (aProjectWrapper.isExisting()) {
             Activator.info(" -> Update OSGi Test fragment project: " + aTestProjectName);
-            FixProjectDefinition.run(aProjectWrapper.toJavaProject());
-         }
+            ProjectConfiguration aAdditionalConfig = AdditionalProjectConfigurationDefinitionProvider.getInstance().find(aTestProjectName);
+            aProjectWrapper.toJavaProject()
+                    .updateTestFragmentManifest(theProject, () -> aAdditionalConfig.additionalPackageDependencies, () -> Collections.emptySet(), Collections.emptyMap())
+                    .updateBuildProperties(aAdditionalConfig.additionalBundles).refresh();
+
+            FixProjectDefinition.run(aProjectWrapper);
+        }
     }
 }
