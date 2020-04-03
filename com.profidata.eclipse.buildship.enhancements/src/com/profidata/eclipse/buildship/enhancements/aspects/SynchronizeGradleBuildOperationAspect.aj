@@ -102,13 +102,13 @@ public aspect SynchronizeGradleBuildOperationAspect {
 
 	private List<EclipseSourceDirectory> withoutTestSourceDirectories(List<EclipseSourceDirectory> theSourceDirectories) {
 		return theSourceDirectories.stream()
-				.filter(theSourceDirectory -> theSourceDirectory.getPath().equals("src") || theSourceDirectory.getPath().startsWith("src/main"))
+				.filter(theSourceDirectory -> theSourceDirectory.getPath().equals("src") || theSourceDirectory.getPath().startsWith("src/main") || theSourceDirectory.getPath().startsWith("src/generated"))
 				.collect(Collectors.toList());
 	}
 
 	private List<IClasspathEntry> onlyTestClasspathEntries(IProject theWorkspaceProject, List<EclipseSourceDirectory> theSourceDirectories) {
 		return theSourceDirectories.stream()
-				.filter(theSourceDirectory -> !(theSourceDirectory.getPath().equals("src") || theSourceDirectory.getPath().startsWith("src/main")))
+				.filter(theSourceDirectory -> !(theSourceDirectory.getPath().equals("src") || theSourceDirectory.getPath().startsWith("src/main") || theSourceDirectory.getPath().startsWith("src/generated")))
 				.map(theTestSourceDirectory -> theWorkspaceProject.getFullPath().append(theTestSourceDirectory.getPath()))
 				.map(thePath -> JavaCore.newSourceEntry(thePath))
 				.collect(Collectors.toList());
