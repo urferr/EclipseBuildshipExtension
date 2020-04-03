@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
@@ -68,12 +69,12 @@ public aspect SynchronizeGradleBuildOperationAspect {
 
 		// When a new project is imported, the plugin nature has not been set initially and therefore the proceed method has been executed
 		if (aProjectWrapper.hasNature(ProjectConstants.PLUGIN_NATURE_ID)) {
-			// if for any reason the gradle classpath container has already been added it will no be removed again.
+			// if for any reason the gradle classpath container has already been added it will now be removed again.
 			aProjectWrapper.removeClasspathEntry(ProjectConstants.GRADLE_CLASSPATH);
 
 			// check if there are folders containing test classes generate corresponding fragment for it.
 			if (!theProject.getName().endsWith("-integration")) {
-				TestFragmentCreator.run(theWorkspaceProject, Arrays.asList("test", "integration", "manual"));
+					TestFragmentCreator.run(theWorkspaceProject, Arrays.asList("test", "integration", "manual"), onlyTestClasspathEntries(theWorkspaceProject, ImmutableList.copyOf(theProject.getSourceDirectories())));
 			}
 		}
 
@@ -102,6 +103,14 @@ public aspect SynchronizeGradleBuildOperationAspect {
 	private List<EclipseSourceDirectory> withoutTestSourceDirectories(List<EclipseSourceDirectory> theSourceDirectories) {
 		return theSourceDirectories.stream()
 				.filter(theSourceDirectory -> theSourceDirectory.getPath().equals("src") || theSourceDirectory.getPath().startsWith("src/main"))
+				.collect(Collectors.toList());
+	}
+
+	private List<IClasspathEntry> onlyTestClasspathEntries(IProject theWorkspaceProject, List<EclipseSourceDirectory> theSourceDirectories) {
+		return theSourceDirectories.stream()
+				.filter(theSourceDirectory -> !(theSourceDirectory.getPath().equals("src") || theSourceDirectory.getPath().startsWith("src/main")))
+				.map(theTestSourceDirectory -> theWorkspaceProject.getFullPath().append(theTestSourceDirectory.getPath()))
+				.map(thePath -> JavaCore.newSourceEntry(thePath))
 				.collect(Collectors.toList());
 	}
 
