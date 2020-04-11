@@ -1,7 +1,5 @@
 package com.profidata.eclipse.project.model.fix;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,7 +13,6 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 
 import com.profidata.eclipse.project.model.Activator;
 import com.profidata.eclipse.project.model.ProjectConstants;
@@ -43,35 +40,29 @@ public class TestFragmentCreator {
 			return;
 		}
 
-		try {
-			IWorkspace aWorkspace = this.project.getWorkspace();
-			String aTestProjectName = this.project.getName() + ".test";
-			ProjectWrapper aTestProjectWrapper = ProjectWrapper.of(aWorkspace, aTestProjectName);
+		IWorkspace aWorkspace = this.project.getWorkspace();
+		String aTestProjectName = this.project.getName() + ".test";
+		ProjectWrapper aTestProjectWrapper = ProjectWrapper.of(aWorkspace, aTestProjectName);
 
-			List<IClasspathEntry> allTestSourceClasspathEntries = theTestClassPathEntries.stream()
-					.filter(theEntry -> theEntry.getContentKind() == IPackageFragmentRoot.K_SOURCE && theEntry.getEntryKind() == IClasspathEntry.CPE_SOURCE)
-					.filter(
-							theEntry -> this.testTypes.contains(theEntry.getPath().removeFirstSegments(1).segment(0))
-									|| (theEntry.getPath().removeFirstSegments(1).segmentCount() > 1 && theEntry.getPath().removeFirstSegments(1).segment(0).equals("src")
-											&& this.testTypes.contains(theEntry.getPath().removeFirstSegments(1).segment(1))))
-					.collect(Collectors.toList());
+		List<IClasspathEntry> allTestSourceClasspathEntries = theTestClassPathEntries.stream()
+				.filter(theEntry -> theEntry.getContentKind() == IPackageFragmentRoot.K_SOURCE && theEntry.getEntryKind() == IClasspathEntry.CPE_SOURCE)
+				.filter(
+						theEntry -> this.testTypes.contains(theEntry.getPath().removeFirstSegments(1).segment(0))
+								|| (theEntry.getPath().removeFirstSegments(1).segmentCount() > 1 && theEntry.getPath().removeFirstSegments(1).segment(0).equals("src")
+										&& this.testTypes.contains(theEntry.getPath().removeFirstSegments(1).segment(1))))
+				.collect(Collectors.toList());
 
-			if (!aTestProjectWrapper.isExisting()) {
-				List<IClasspathEntry> allChangedClasspathEntries = new ArrayList<>(Arrays.asList(aJavaProject.getRawClasspath()));
+		if (!aTestProjectWrapper.isExisting()) {
+			ProjectWrapper aProjectWrapper = ProjectWrapper.of(this.project);
 
-				if (allChangedClasspathEntries.removeAll(allTestSourceClasspathEntries)) {
-					aJavaProject.setRawClasspath(allChangedClasspathEntries.toArray(new IClasspathEntry[allChangedClasspathEntries.size()]), null);
-				}
+			aProjectWrapper.asJavaProject();
+			allTestSourceClasspathEntries.forEach(theTestClaspathEntry -> aProjectWrapper.removeClasspathEntry(theTestClaspathEntry.getPath()));
 
-				createTestProject(this.project, allTestSourceClasspathEntries);
-			}
-
-			else {
-				updateTestProject(this.project, allTestSourceClasspathEntries);
-			}
+			createTestProject(this.project, allTestSourceClasspathEntries);
 		}
-		catch (JavaModelException theCause) {
-			Activator.error("Could not access class path of project '" + this.project.getName() + "': " + theCause.getMessage());
+
+		else {
+			updateTestProject(this.project, allTestSourceClasspathEntries);
 		}
 	}
 
