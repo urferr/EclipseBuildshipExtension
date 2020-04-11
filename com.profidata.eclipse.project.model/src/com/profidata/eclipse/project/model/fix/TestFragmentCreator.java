@@ -39,12 +39,16 @@ public class TestFragmentCreator {
 	private void create(List<IClasspathEntry> theTestClassPathEntries) {
 		IJavaProject aJavaProject = JavaCore.create(this.project);
 
-		try {
-			IClasspathEntry[] allClasspathEntries = aJavaProject.getRawClasspath();
-			List<IClasspathEntry> allTestSourceClasspathEntries;
+		if (theTestClassPathEntries.isEmpty()) {
+			return;
+		}
 
-			// first we check for unit tests
-			allTestSourceClasspathEntries = Arrays.stream(allClasspathEntries)
+		try {
+			IWorkspace aWorkspace = this.project.getWorkspace();
+			String aTestProjectName = this.project.getName() + ".test";
+			ProjectWrapper aTestProjectWrapper = ProjectWrapper.of(aWorkspace, aTestProjectName);
+
+			List<IClasspathEntry> allTestSourceClasspathEntries = theTestClassPathEntries.stream()
 					.filter(theEntry -> theEntry.getContentKind() == IPackageFragmentRoot.K_SOURCE && theEntry.getEntryKind() == IClasspathEntry.CPE_SOURCE)
 					.filter(
 							theEntry -> this.testTypes.contains(theEntry.getPath().removeFirstSegments(1).segment(0))
@@ -52,25 +56,17 @@ public class TestFragmentCreator {
 											&& this.testTypes.contains(theEntry.getPath().removeFirstSegments(1).segment(1))))
 					.collect(Collectors.toList());
 
-			if (!allTestSourceClasspathEntries.isEmpty()) {
-				List<IClasspathEntry> allChangedClasspathEntries = new ArrayList<>(Arrays.asList(allClasspathEntries));
+			if (!aTestProjectWrapper.isExisting()) {
+				List<IClasspathEntry> allChangedClasspathEntries = new ArrayList<>(Arrays.asList(aJavaProject.getRawClasspath()));
 
-				allChangedClasspathEntries.removeAll(allTestSourceClasspathEntries);
-
-				aJavaProject.setRawClasspath(allChangedClasspathEntries.toArray(new IClasspathEntry[allChangedClasspathEntries.size()]), null);
+				if (allChangedClasspathEntries.removeAll(allTestSourceClasspathEntries)) {
+					aJavaProject.setRawClasspath(allChangedClasspathEntries.toArray(new IClasspathEntry[allChangedClasspathEntries.size()]), null);
+				}
 
 				createTestProject(this.project, allTestSourceClasspathEntries);
 			}
 
 			else {
-				allTestSourceClasspathEntries = theTestClassPathEntries.stream()
-						.filter(theEntry -> theEntry.getContentKind() == IPackageFragmentRoot.K_SOURCE && theEntry.getEntryKind() == IClasspathEntry.CPE_SOURCE)
-						.filter(
-								theEntry -> this.testTypes.contains(theEntry.getPath().removeFirstSegments(1).segment(0))
-										|| (theEntry.getPath().removeFirstSegments(1).segmentCount() > 1 && theEntry.getPath().removeFirstSegments(1).segment(0).equals("src")
-												&& this.testTypes.contains(theEntry.getPath().removeFirstSegments(1).segment(1))))
-						.collect(Collectors.toList());
-
 				updateTestProject(this.project, allTestSourceClasspathEntries);
 			}
 		}

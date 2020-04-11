@@ -565,7 +565,7 @@ public class ProjectWrapper {
 		List<String> someImportPackages = new ArrayList<>(theImportPackages);
 		int somePackagesAdded = 0;
 
-		if (aImportPackageHeader == null) {
+		if (aImportPackageHeader == null && !someImportPackages.isEmpty()) {
 			String aPackage = someImportPackages.get(0);
 			theBundle.setHeader(Constants.IMPORT_PACKAGE, aPackage);
 
@@ -600,7 +600,7 @@ public class ProjectWrapper {
 		List<String> someExportPackages = new ArrayList<>(theImportPackages);
 		int somePackagesAdded = 0;
 
-		if (aExportPackageHeader == null) {
+		if (aExportPackageHeader == null && !someExportPackages.isEmpty()) {
 			theBundle.setHeader(Constants.EXPORT_PACKAGE, someExportPackages.get(0));
 
 			someExportPackages.remove(0);
@@ -669,6 +669,10 @@ public class ProjectWrapper {
 				IBundle aBundle = aBundleModelBase.getBundleModel().getBundle();
 				ProjectWrapper aHostBundleProjectWrapper = ProjectWrapper.of(theHostBundleProject);
 
+				if (aHostBundleProjectWrapper.hasNature(JavaCore.NATURE_ID)) {
+					aHostBundleProjectWrapper.asJavaProject();
+				}
+
 				aBundleFragment.setSchemaVersion("1.0");
 				aBundle.setHeader(Constants.BUNDLE_MANIFESTVERSION, "2");
 
@@ -711,6 +715,10 @@ public class ProjectWrapper {
 
 			IBundle aBundle = aBundleModelBase.getBundleModel().getBundle();
 			ProjectWrapper aHostBundleProjectWrapper = ProjectWrapper.of(theHostBundleProject);
+
+			if (aHostBundleProjectWrapper.hasNature(JavaCore.NATURE_ID)) {
+				aHostBundleProjectWrapper.asJavaProject();
+			}
 
 			List<String> allSortedImportedPackages = determinePackagesToImport(
 					aHostBundleProjectWrapper
