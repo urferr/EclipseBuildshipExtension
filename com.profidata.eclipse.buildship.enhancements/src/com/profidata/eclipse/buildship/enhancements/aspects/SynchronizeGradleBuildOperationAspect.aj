@@ -57,6 +57,9 @@ public aspect SynchronizeGradleBuildOperationAspect {
 				aProjectWrapper.asJavaProject();
 				FixProjectDefinition.run(aProjectWrapper);
 			}
+			else {
+				FixProjectDefinition.run(aProjectWrapper, true);
+			}
 		}
 		else if (aProjectWrapper.hasNature(JavaCore.NATURE_ID)) {
 			try {

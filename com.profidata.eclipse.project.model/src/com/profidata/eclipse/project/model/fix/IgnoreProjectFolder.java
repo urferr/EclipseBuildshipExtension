@@ -2,12 +2,12 @@ package com.profidata.eclipse.project.model.fix;
 
 import java.text.MessageFormat;
 
-import com.profidata.eclipse.project.model.Activator;
-
 import org.eclipse.core.resources.FileInfoMatcherDescription;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceFilterDescription;
 import org.eclipse.core.runtime.CoreException;
+
+import com.profidata.eclipse.project.model.Activator;
 
 public class IgnoreProjectFolder {
 	private final IProject project;
@@ -18,22 +18,22 @@ public class IgnoreProjectFolder {
 	}
 
 	private IgnoreProjectFolder(IProject theProject, String theProjectFolder) {
-		this.project = theProject;
-		this.projectFolder = theProjectFolder;
+		project = theProject;
+		projectFolder = theProjectFolder;
 	}
 
 	private void execute() {
-		if (hasFolder(this.project, this.projectFolder)) {
-			Activator.info(MessageFormat.format("ignore ''{0}'' in project ''{1}''", this.projectFolder, this.project.getName()));
+		if (hasFolder(project, projectFolder)) {
+			Activator.info(MessageFormat.format("ignore ''{0}'' in project ''{1}''", projectFolder, project.getName()));
 			try {
-				this.project.createFilter(
+				project.createFilter(
 						IResourceFilterDescription.EXCLUDE_ALL | IResourceFilterDescription.FOLDERS | IResourceFilterDescription.INHERITABLE,
-						new FileInfoMatcherDescription("org.eclipse.ui.ide.multiFilter", "1.0-name-matches-false-false-" + this.projectFolder),
+						new FileInfoMatcherDescription("org.eclipse.ui.ide.multiFilter", "1.0-name-matches-false-false-" + projectFolder),
 						0,
 						null);
 			}
 			catch (CoreException theCause) {
-			    Activator.error(" -> failed: " + theCause.getMessage());
+				Activator.error(" -> failed: " + theCause.getMessage());
 			}
 		}
 	}

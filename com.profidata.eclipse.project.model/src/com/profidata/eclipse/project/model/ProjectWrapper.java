@@ -74,37 +74,37 @@ public class ProjectWrapper {
 	}
 
 	private ProjectWrapper(IProject theProject) {
-		this.project = Objects.requireNonNull(theProject);
+		project = Objects.requireNonNull(theProject);
 	}
 
 	public ProjectWrapper createProject() {
-		if (!this.project.exists()) {
+		if (!project.exists()) {
 			try {
-				this.project.create(null);
+				project.create(null);
 			}
 			catch (CoreException theCause) {
-				this.errorMessage = "Could not create project '" + this.project.getName() + "': " + theCause.getMessage();
+				errorMessage = "Could not create project '" + project.getName() + "': " + theCause.getMessage();
 			}
 		}
 		else {
-			this.errorMessage = "Project '" + this.project.getName() + "' already exists";
+			errorMessage = "Project '" + project.getName() + "' already exists";
 		}
 		return this;
 	}
 
 	public ProjectWrapper importProject(IWorkspace theWorkspace, IPath theProjectPath) {
-		if (!this.project.exists()) {
+		if (!project.exists()) {
 			try {
 				IProjectDescription aProjectDescription = theWorkspace.loadProjectDescription(theProjectPath.append(IProjectDescription.DESCRIPTION_FILE_NAME));
 
-				this.project.create(aProjectDescription, null);
+				project.create(aProjectDescription, null);
 			}
 			catch (CoreException theCause) {
-				this.errorMessage = "Could not create project '" + this.project.getName() + " with project description': " + theCause.getMessage();
+				errorMessage = "Could not create project '" + project.getName() + " with project description': " + theCause.getMessage();
 			}
 		}
 		else {
-			this.errorMessage = "Project '" + this.project.getName() + "' already exists";
+			errorMessage = "Project '" + project.getName() + "' already exists";
 		}
 		return this;
 	}
@@ -112,7 +112,7 @@ public class ProjectWrapper {
 	public ProjectWrapper toJavaProject() {
 		if (!hasError()) {
 			addNature(JavaCore.NATURE_ID);
-			this.javaProject = JavaCore.create(this.project);
+			javaProject = JavaCore.create(project);
 		}
 		return this;
 	}
@@ -120,10 +120,10 @@ public class ProjectWrapper {
 	public ProjectWrapper asJavaProject() {
 		if (!hasError()) {
 			if (hasNature(JavaCore.NATURE_ID)) {
-				this.javaProject = JavaCore.create(this.project);
+				javaProject = JavaCore.create(project);
 			}
 			else {
-				this.errorMessage = "Project '" + this.project.getName() + "' is no Java project";
+				errorMessage = "Project '" + project.getName() + "' is no Java project";
 			}
 		}
 		return this;
@@ -132,17 +132,17 @@ public class ProjectWrapper {
 	public ProjectWrapper addNature(String theNatureId) {
 		if (!hasError()) {
 			try {
-				if (!this.project.hasNature(theNatureId)) {
-					IProjectDescription aProjectDescription = this.project.getDescription();
+				if (!project.hasNature(theNatureId)) {
+					IProjectDescription aProjectDescription = project.getDescription();
 					List<String> allNatureIds = new ArrayList<>(Arrays.asList(aProjectDescription.getNatureIds()));
 
 					allNatureIds.add(theNatureId);
 					aProjectDescription.setNatureIds(allNatureIds.toArray(new String[allNatureIds.size()]));
-					this.project.setDescription(aProjectDescription, null);
+					project.setDescription(aProjectDescription, null);
 				}
 			}
 			catch (CoreException theCause) {
-				this.errorMessage = "Could not add nature '" + theNatureId + "' to project '" + this.project.getName() + "': " + theCause.getMessage();
+				errorMessage = "Could not add nature '" + theNatureId + "' to project '" + project.getName() + "': " + theCause.getMessage();
 			}
 		}
 		return this;
@@ -151,37 +151,37 @@ public class ProjectWrapper {
 	public ProjectWrapper removeNature(String theNatureId) {
 		if (!hasError()) {
 			try {
-				if (this.project.hasNature(theNatureId)) {
-					IProjectDescription aProjectDescription = this.project.getDescription();
+				if (project.hasNature(theNatureId)) {
+					IProjectDescription aProjectDescription = project.getDescription();
 					List<String> allNatureIds = Arrays.asList(aProjectDescription.getNatureIds()).stream().filter(theExistingNatureId -> !theExistingNatureId.equals(theNatureId))
 							.collect(Collectors.toList());
 
 					aProjectDescription.setNatureIds(allNatureIds.toArray(new String[allNatureIds.size()]));
-					this.project.setDescription(aProjectDescription, null);
+					project.setDescription(aProjectDescription, null);
 				}
 			}
 			catch (CoreException theCause) {
-				this.errorMessage = "Could not add nature '" + theNatureId + "' to project '" + this.project.getName() + "': " + theCause.getMessage();
+				errorMessage = "Could not add nature '" + theNatureId + "' to project '" + project.getName() + "': " + theCause.getMessage();
 			}
 		}
 		return this;
 	}
 
 	public boolean isExisting() {
-		return this.project.exists();
+		return project.exists();
 	}
 
 	public IProject getProject() {
-		return this.project;
+		return project;
 	}
 
 	public IJavaProject getJavaProject() {
-		return this.javaProject;
+		return javaProject;
 	}
 
 	public IProjectDescription getProjectDescription() {
 		try {
-			return this.project.getDescription();
+			return project.getDescription();
 		}
 		catch (CoreException theCause) {
 			return null;
@@ -191,10 +191,10 @@ public class ProjectWrapper {
 	public ProjectWrapper setProjectDescription(IProjectDescription theProjectDescription) {
 		if (!hasError()) {
 			try {
-				this.project.setDescription(theProjectDescription, null);
+				project.setDescription(theProjectDescription, null);
 			}
 			catch (CoreException theCause) {
-				this.errorMessage = "Could not set description for project '" + this.project.getName() + "': " + theCause.getMessage();
+				errorMessage = "Could not set description for project '" + project.getName() + "': " + theCause.getMessage();
 			}
 		}
 		return this;
@@ -202,39 +202,39 @@ public class ProjectWrapper {
 
 	public ProjectWrapper open() {
 		try {
-			if (!this.project.isOpen()) {
-				this.project.open(null);
+			if (!project.isOpen()) {
+				project.open(null);
 			}
 		}
 		catch (CoreException theCause) {
-			this.errorMessage = "Could not open project '" + this.project.getName() + "': " + theCause.getMessage();
+			errorMessage = "Could not open project '" + project.getName() + "': " + theCause.getMessage();
 		}
 		return this;
 	}
 
 	public boolean isOpen() {
-		if (this.project.exists()) {
-			return this.project.isOpen();
+		if (project.exists()) {
+			return project.isOpen();
 		}
 		return false;
 	}
 
 	public ProjectWrapper close() {
 		try {
-			if (this.project.isOpen()) {
-				this.project.close(null);
+			if (project.isOpen()) {
+				project.close(null);
 			}
 		}
 		catch (CoreException theCause) {
-			this.errorMessage = "Could not close project '" + this.project.getName() + "': " + theCause.getMessage();
+			errorMessage = "Could not close project '" + project.getName() + "': " + theCause.getMessage();
 		}
 		return this;
 	}
 
 	public boolean hasNature(String theNatureId) {
 		try {
-			if (this.project.exists()) {
-				return this.project.hasNature(theNatureId);
+			if (project.exists()) {
+				return project.hasNature(theNatureId);
 			}
 			return false;
 		}
@@ -246,11 +246,11 @@ public class ProjectWrapper {
 	public ProjectWrapper addBuilder(String theBuilderId) {
 		if (!hasError()) {
 			try {
-				ICommand aBuilderCommand = this.project.getDescription().newCommand();
+				ICommand aBuilderCommand = project.getDescription().newCommand();
 				aBuilderCommand.setBuilderName(theBuilderId);
 			}
 			catch (CoreException theCause) {
-				this.errorMessage = "Could not add builder '" + theBuilderId + "' to project '" + this.project.getName() + "': " + theCause.getMessage();
+				errorMessage = "Could not add builder '" + theBuilderId + "' to project '" + project.getName() + "': " + theCause.getMessage();
 			}
 		}
 		return this;
@@ -261,19 +261,19 @@ public class ProjectWrapper {
 
 		removeDefaultSourceFolder();
 		if (!hasError()) {
-			IPath aClasspath = this.project.getFullPath().append(theFolderName);
+			IPath aClasspath = project.getFullPath().append(theFolderName);
 
 			addClasspathEntry(theProject -> JavaCore.newSourceEntry(aClasspath));
 		}
 		if (!hasError()) {
 			try {
-				IFolder aSourceFolder = this.project.getFolder(theFolderName);
+				IFolder aSourceFolder = project.getFolder(theFolderName);
 				if (!aSourceFolder.exists()) {
 					aSourceFolder.create(true, true, null);
 				}
 			}
 			catch (CoreException theCause) {
-				this.errorMessage = "Could not create source folder '" + theFolderName + "' in Java project '" + this.project.getName() + "': " + theCause.getMessage();
+				errorMessage = "Could not create source folder '" + theFolderName + "' in Java project '" + project.getName() + "': " + theCause.getMessage();
 			}
 		}
 		return this;
@@ -281,19 +281,19 @@ public class ProjectWrapper {
 
 	public ProjectWrapper addLinkedSourceFolder(String theFolderName, IPath theSourceLocation) {
 		if (!hasError()) {
-			IPath aClasspath = this.project.getFullPath().append(theFolderName);
+			IPath aClasspath = project.getFullPath().append(theFolderName);
 
 			addClasspathEntry(theProject -> JavaCore.newSourceEntry(aClasspath));
 		}
 		if (!hasError()) {
-			IFolder aSourceLinkFolder = this.project.getFolder(theFolderName);
+			IFolder aSourceLinkFolder = project.getFolder(theFolderName);
 
 			if (!aSourceLinkFolder.exists()) {
 				try {
 					aSourceLinkFolder.createLink(theSourceLocation, IResource.NONE, null);
 				}
 				catch (CoreException theCause) {
-					this.errorMessage = "Could not create linked source folder '" + theFolderName + "' in Java project '" + this.project.getName() + "' to location '"
+					errorMessage = "Could not create linked source folder '" + theFolderName + "' in Java project '" + project.getName() + "' to location '"
 							+ theSourceLocation + "': " + theCause.getMessage();
 				}
 			}
@@ -306,11 +306,11 @@ public class ProjectWrapper {
 
 		if (!hasError()) {
 			try {
-				Arrays.asList(this.javaProject.getRawClasspath()).stream().filter(theClasspathEntry -> theClasspathEntry.getPath().equals(this.project.getFullPath())).findFirst()
+				Arrays.asList(javaProject.getRawClasspath()).stream().filter(theClasspathEntry -> theClasspathEntry.getPath().equals(project.getFullPath())).findFirst()
 						.ifPresent(theClasspathEntry -> removeClasspathEntry(theProject -> theClasspathEntry));
 			}
 			catch (JavaModelException theCause) {
-				this.errorMessage = "Could not remove default source folder from Java project '" + this.project.getName() + "': " + theCause.getMessage();
+				errorMessage = "Could not remove default source folder from Java project '" + project.getName() + "': " + theCause.getMessage();
 			}
 		}
 		return this;
@@ -321,20 +321,20 @@ public class ProjectWrapper {
 
 		if (!hasError()) {
 			try {
-				Arrays.asList(this.javaProject.getRawClasspath()).stream()
-						.filter(theClasspathEntry -> theClasspathEntry.getPath().equals(this.project.getFullPath().append(theFolderName))).findFirst()
+				Arrays.asList(javaProject.getRawClasspath()).stream()
+						.filter(theClasspathEntry -> theClasspathEntry.getPath().equals(project.getFullPath().append(theFolderName))).findFirst()
 						.ifPresent(theClasspathEntry -> removeClasspathEntry(theProject -> theClasspathEntry));
 			}
 			catch (JavaModelException theCause) {
-				this.errorMessage = "Could not remove source folder '" + theFolderName + "' from Java project '" + this.project.getName() + "': " + theCause.getMessage();
+				errorMessage = "Could not remove source folder '" + theFolderName + "' from Java project '" + project.getName() + "': " + theCause.getMessage();
 			}
 			if (!hasError()) {
 				try {
-					IFolder folder = this.project.getFolder(theFolderName);
+					IFolder folder = project.getFolder(theFolderName);
 					folder.delete(true, null);
 				}
 				catch (CoreException theCause) {
-					this.errorMessage = "Could not create source folder '" + theFolderName + "' in Java project '" + this.project.getName() + "': " + theCause.getMessage();
+					errorMessage = "Could not create source folder '" + theFolderName + "' in Java project '" + project.getName() + "': " + theCause.getMessage();
 				}
 			}
 		}
@@ -345,16 +345,16 @@ public class ProjectWrapper {
 		verifyJavaProject();
 
 		if (!hasError()) {
-			IFolder aBinaryFolder = this.project.getFolder(theFolderName);
+			IFolder aBinaryFolder = project.getFolder(theFolderName);
 
 			try {
 				if (!aBinaryFolder.exists()) {
 					aBinaryFolder.create(false, true, null);
 				}
-				this.javaProject.setOutputLocation(aBinaryFolder.getFullPath(), null);
+				javaProject.setOutputLocation(aBinaryFolder.getFullPath(), null);
 			}
 			catch (CoreException theCause) {
-				this.errorMessage = "Could not set output folder '" + theFolderName + "' in Java project '" + this.project.getName() + "': " + theCause.getMessage();
+				errorMessage = "Could not set output folder '" + theFolderName + "' in Java project '" + project.getName() + "': " + theCause.getMessage();
 			}
 		}
 		return this;
@@ -364,29 +364,29 @@ public class ProjectWrapper {
 		verifyJavaProject();
 
 		if (!hasError()) {
-			IClasspathEntry aClasspathEntry = theClasspathEntrySupplier.apply(this.project);
+			IClasspathEntry aClasspathEntry = theClasspathEntrySupplier.apply(project);
 			if (!hasClasspathEntry(aClasspathEntry.getPath())) {
 				try {
-					List<IClasspathEntry> allClasspathEntries = new ArrayList<>(Arrays.asList(this.javaProject.getRawClasspath()));
+					List<IClasspathEntry> allClasspathEntries = new ArrayList<>(Arrays.asList(javaProject.getRawClasspath()));
 
 					allClasspathEntries.add(aClasspathEntry);
-					this.javaProject.setRawClasspath(allClasspathEntries.toArray(new IClasspathEntry[allClasspathEntries.size()]), null);
+					javaProject.setRawClasspath(allClasspathEntries.toArray(new IClasspathEntry[allClasspathEntries.size()]), null);
 				}
 				catch (JavaModelException theCause) {
-					this.errorMessage = "Could not add classpath entry '" + aClasspathEntry + "' to Java project '" + this.project.getName() + "': " + theCause.getMessage();
+					errorMessage = "Could not add classpath entry '" + aClasspathEntry + "' to Java project '" + project.getName() + "': " + theCause.getMessage();
 				}
 			}
 
 			else if (hasDifferentAccessRules(aClasspathEntry.getAccessRules(), getClasspathEntry(aClasspathEntry.getPath()).getAccessRules())) {
 				try {
-					List<IClasspathEntry> allClasspathEntries = new ArrayList<>(Arrays.asList(this.javaProject.getRawClasspath())).stream()
+					List<IClasspathEntry> allClasspathEntries = new ArrayList<>(Arrays.asList(javaProject.getRawClasspath())).stream()
 							.filter(theClasspathEntry -> !theClasspathEntry.getPath().equals(aClasspathEntry.getPath())).collect(Collectors.toList());
 
 					allClasspathEntries.add(aClasspathEntry);
-					this.javaProject.setRawClasspath(allClasspathEntries.toArray(new IClasspathEntry[allClasspathEntries.size()]), null);
+					javaProject.setRawClasspath(allClasspathEntries.toArray(new IClasspathEntry[allClasspathEntries.size()]), null);
 				}
 				catch (JavaModelException theCause) {
-					this.errorMessage = "Could not modify accessrules of classpath entry '" + aClasspathEntry + "' in Java project '" + this.project.getName() + "': "
+					errorMessage = "Could not modify accessrules of classpath entry '" + aClasspathEntry + "' in Java project '" + project.getName() + "': "
 							+ theCause.getMessage();
 				}
 			}
@@ -415,15 +415,15 @@ public class ProjectWrapper {
 		verifyJavaProject();
 
 		if (!hasError()) {
-			IClasspathEntry aClasspathEntry = theClasspathEntrySupplier.apply(this.project);
+			IClasspathEntry aClasspathEntry = theClasspathEntrySupplier.apply(project);
 			try {
-				List<IClasspathEntry> allClasspathEntries = new ArrayList<>(Arrays.asList(this.javaProject.getRawClasspath())).stream()
+				List<IClasspathEntry> allClasspathEntries = new ArrayList<>(Arrays.asList(javaProject.getRawClasspath())).stream()
 						.filter(theClasspathEntry -> !theClasspathEntry.getPath().equals(aClasspathEntry.getPath())).collect(Collectors.toList());
 
-				this.javaProject.setRawClasspath(allClasspathEntries.toArray(new IClasspathEntry[allClasspathEntries.size()]), null);
+				javaProject.setRawClasspath(allClasspathEntries.toArray(new IClasspathEntry[allClasspathEntries.size()]), null);
 			}
 			catch (JavaModelException theCause) {
-				this.errorMessage = "Could not remove classpath entry '" + aClasspathEntry + "' of Java project '" + this.project.getName() + "': " + theCause.getMessage();
+				errorMessage = "Could not remove classpath entry '" + aClasspathEntry + "' of Java project '" + project.getName() + "': " + theCause.getMessage();
 			}
 		}
 		return this;
@@ -434,13 +434,13 @@ public class ProjectWrapper {
 
 		if (!hasError()) {
 			try {
-				List<IClasspathEntry> allClasspathEntries = new ArrayList<>(Arrays.asList(this.javaProject.getRawClasspath())).stream()
+				List<IClasspathEntry> allClasspathEntries = new ArrayList<>(Arrays.asList(javaProject.getRawClasspath())).stream()
 						.filter(theClasspathEntry -> !theClasspathEntry.getPath().equals(thePath)).collect(Collectors.toList());
 
-				this.javaProject.setRawClasspath(allClasspathEntries.toArray(new IClasspathEntry[allClasspathEntries.size()]), null);
+				javaProject.setRawClasspath(allClasspathEntries.toArray(new IClasspathEntry[allClasspathEntries.size()]), null);
 			}
 			catch (JavaModelException theCause) {
-				this.errorMessage = "Could not remove classpath entry with path '" + thePath + "' of Java project '" + this.project.getName() + "': " + theCause.getMessage();
+				errorMessage = "Could not remove classpath entry with path '" + thePath + "' of Java project '" + project.getName() + "': " + theCause.getMessage();
 			}
 		}
 		return this;
@@ -455,7 +455,7 @@ public class ProjectWrapper {
 
 		try {
 			if (!hasError()) {
-				return new ArrayList<>(Arrays.asList(this.javaProject.getRawClasspath())).stream().filter(theClasspathEntry -> theClasspathEntry.getPath().equals(thePath))
+				return new ArrayList<>(Arrays.asList(javaProject.getRawClasspath())).stream().filter(theClasspathEntry -> theClasspathEntry.getPath().equals(thePath))
 						.findFirst().orElse(null);
 			}
 			return null;
@@ -471,7 +471,7 @@ public class ProjectWrapper {
 		verifyJavaProject();
 
 		if (!hasError()) {
-			IPluginModel aBundlePluginModel = new WorkspaceBundlePluginModel(PDEProject.getManifest(this.project), PDEProject.getPluginXml(this.project));
+			IPluginModel aBundlePluginModel = new WorkspaceBundlePluginModel(PDEProject.getManifest(project), PDEProject.getPluginXml(project));
 			IBundlePluginModelBase aBundleModelBase = (IBundlePluginModelBase) aBundlePluginModel;
 			IBundlePlugin aBundlePlugin = (IBundlePlugin) aBundlePluginModel.getPluginBase();
 
@@ -481,7 +481,7 @@ public class ProjectWrapper {
 				aBundlePlugin.setSchemaVersion("1.0");
 				aBundle.setHeader(Constants.BUNDLE_MANIFESTVERSION, "2");
 
-				aBundlePlugin.setId(this.project.getName());
+				aBundlePlugin.setId(project.getName());
 				aBundlePlugin.setVersion("0.0.0");
 				aBundlePlugin.setProviderName("Reto Urfer (Profidata AG)");
 
@@ -506,7 +506,7 @@ public class ProjectWrapper {
 				aBundleModelBase.save();
 			}
 			catch (CoreException theCause) {
-				this.errorMessage = "Could not manifest for plugin project '" + this.project.getName() + "': " + theCause.getMessage();
+				errorMessage = "Could not manifest for plugin project '" + project.getName() + "': " + theCause.getMessage();
 			}
 		}
 		return this;
@@ -516,7 +516,7 @@ public class ProjectWrapper {
 		verifyJavaProject();
 
 		if (!hasError()) {
-			IPluginModel aBundlePluginModel = new WorkspaceBundlePluginModel(PDEProject.getManifest(this.project), PDEProject.getPluginXml(this.project));
+			IPluginModel aBundlePluginModel = new WorkspaceBundlePluginModel(PDEProject.getManifest(project), PDEProject.getPluginXml(project));
 			IBundlePluginModelBase aBundleModelBase = (IBundlePluginModelBase) aBundlePluginModel;
 			IBundle aBundle = aBundleModelBase.getBundleModel().getBundle();
 			IManifestHeader aHeader = aBundle.getManifestHeader(Constants.BUNDLE_SYMBOLICNAME);
@@ -526,13 +526,13 @@ public class ProjectWrapper {
 
 				if (aBundleSymbolicNameHeader.isSingleton() != theSingleton) {
 					aBundleSymbolicNameHeader.setSingleton(theSingleton);
-					addProtocolMessage(" - " + this.project.getName() + " -> singleton = " + theSingleton);
+					addProtocolMessage(" - " + project.getName() + " -> singleton = " + theSingleton);
 					aBundleModelBase.save();
 				}
 			}
 
 			else {
-				this.errorMessage = "bundle symbolic name header of project '" + this.project.getName() + "' is not of type BundleSymbolicNameHeader";
+				errorMessage = "bundle symbolic name header of project '" + project.getName() + "' is not of type BundleSymbolicNameHeader";
 			}
 
 		}
@@ -540,7 +540,7 @@ public class ProjectWrapper {
 	}
 
 	public boolean isFragment() {
-		IPluginModel aBundlePluginModel = new WorkspaceBundlePluginModel(PDEProject.getManifest(this.project), PDEProject.getPluginXml(this.project));
+		IPluginModel aBundlePluginModel = new WorkspaceBundlePluginModel(PDEProject.getManifest(project), PDEProject.getPluginXml(project));
 		IBundlePluginModelBase aBundleModelBase = (IBundlePluginModelBase) aBundlePluginModel;
 		IBundle aBundle = aBundleModelBase.getBundleModel().getBundle();
 		IManifestHeader aHeader = aBundle.getManifestHeader(Constants.FRAGMENT_HOST);
@@ -549,7 +549,7 @@ public class ProjectWrapper {
 	}
 
 	public String getFragmentHostId() {
-		IPluginModel aBundlePluginModel = new WorkspaceBundlePluginModel(PDEProject.getManifest(this.project), PDEProject.getPluginXml(this.project));
+		IPluginModel aBundlePluginModel = new WorkspaceBundlePluginModel(PDEProject.getManifest(project), PDEProject.getPluginXml(project));
 		IBundlePluginModelBase aBundleModelBase = (IBundlePluginModelBase) aBundlePluginModel;
 		IBundle aBundle = aBundleModelBase.getBundleModel().getBundle();
 		IManifestHeader aHeader = aBundle.getManifestHeader(Constants.FRAGMENT_HOST);
@@ -622,7 +622,7 @@ public class ProjectWrapper {
 		verifyJavaProject();
 
 		if (!hasError()) {
-			IPluginModel aBundlePluginModel = new WorkspaceBundlePluginModel(PDEProject.getManifest(this.project), PDEProject.getPluginXml(this.project));
+			IPluginModel aBundlePluginModel = new WorkspaceBundlePluginModel(PDEProject.getManifest(project), PDEProject.getPluginXml(project));
 			IBundlePluginModelBase aBundleModelBase = (IBundlePluginModelBase) aBundlePluginModel;
 			IBundle aBundle = aBundleModelBase.getBundleModel().getBundle();
 			Set<String> someAdditionalPackageDependencies = Optional.ofNullable(theAdditionalPackageDependencies.get()).orElseGet(() -> Collections.emptySet());
@@ -661,7 +661,7 @@ public class ProjectWrapper {
 		verifyJavaProject();
 
 		if (!hasError()) {
-			IFragmentModel aFragmentModel = new WorkspaceBundleFragmentModel(PDEProject.getManifest(this.project), PDEProject.getFragmentXml(this.project));
+			IFragmentModel aFragmentModel = new WorkspaceBundleFragmentModel(PDEProject.getManifest(project), PDEProject.getFragmentXml(project));
 			IBundlePluginModelBase aBundleModelBase = (IBundlePluginModelBase) aFragmentModel;
 			IBundleFragment aBundleFragment = (IBundleFragment) aFragmentModel.getPluginBase();
 
@@ -677,7 +677,7 @@ public class ProjectWrapper {
 				aBundle.setHeader(Constants.BUNDLE_MANIFESTVERSION, "2");
 
 				aBundleFragment.setName("Test wrapper fragment to " + theHostBundleProject.getName());
-				aBundleFragment.setId(this.project.getName());
+				aBundleFragment.setId(project.getName());
 				aBundleFragment.setVersion("0.0.0");
 				aBundleFragment.setProviderName("Reto Urfer (Profidata AG)");
 
@@ -696,7 +696,7 @@ public class ProjectWrapper {
 				aBundleModelBase.save();
 			}
 			catch (CoreException theCause) {
-				this.errorMessage = "Could not manifest for test fragment project '" + this.project.getName() + "': " + theCause.getMessage();
+				errorMessage = "Could not manifest for test fragment project '" + project.getName() + "': " + theCause.getMessage();
 			}
 		}
 		return this;
@@ -710,7 +710,7 @@ public class ProjectWrapper {
 		verifyJavaProject();
 
 		if (!hasError()) {
-			IFragmentModel aFragmentModel = new WorkspaceBundleFragmentModel(PDEProject.getManifest(this.project), PDEProject.getFragmentXml(this.project));
+			IFragmentModel aFragmentModel = new WorkspaceBundleFragmentModel(PDEProject.getManifest(project), PDEProject.getFragmentXml(project));
 			IBundlePluginModelBase aBundleModelBase = (IBundlePluginModelBase) aFragmentModel;
 
 			IBundle aBundle = aBundleModelBase.getBundleModel().getBundle();
@@ -742,7 +742,7 @@ public class ProjectWrapper {
 		verifyJavaProject();
 
 		if (!hasError()) {
-			IFragmentModel aFragmentModel = new WorkspaceBundleFragmentModel(PDEProject.getManifest(this.project), PDEProject.getFragmentXml(this.project));
+			IFragmentModel aFragmentModel = new WorkspaceBundleFragmentModel(PDEProject.getManifest(project), PDEProject.getFragmentXml(project));
 			IBundlePluginModelBase aBundleModelBase = (IBundlePluginModelBase) aFragmentModel;
 			IBundle aBundle = aBundleModelBase.getBundleModel().getBundle();
 			ProjectWrapper aHostBundleProjectWrapper = ProjectWrapper.of(theWorkspace, getFragmentHostId()).asJavaProject();
@@ -807,12 +807,12 @@ public class ProjectWrapper {
 
 		if (!hasError()) {
 			try {
-				IFile aBuildPropertiesFile = PDEProject.getBuildProperties(this.project);
+				IFile aBuildPropertiesFile = PDEProject.getBuildProperties(project);
 				WorkspaceBuildModel aBuildModel = new WorkspaceBuildModel(aBuildPropertiesFile);
 				IBuildModelFactory aBuildModelFactory = aBuildModel.getFactory();
 				IBuildEntry aBuildEntry;
 
-				List<String> allSourceFolderNamess = Arrays.stream(this.javaProject.getRawClasspath())
+				List<String> allSourceFolderNamess = Arrays.stream(javaProject.getRawClasspath())
 						.filter(theEntry -> theEntry.getContentKind() == IPackageFragmentRoot.K_SOURCE && theEntry.getEntryKind() == IClasspathEntry.CPE_SOURCE)
 						.map(theEntry -> theEntry.getPath().lastSegment()).collect(Collectors.toList());
 
@@ -835,7 +835,7 @@ public class ProjectWrapper {
 							aAdditionalBundleBuildEntry.addToken(theAdditionalBundle);
 						}
 						catch (CoreException theCause) {
-							this.errorMessage = "Could add addition bundle '" + theAdditionalBundle + "' to build.properties file of bundle project '" + this.project.getName()
+							errorMessage = "Could add addition bundle '" + theAdditionalBundle + "' to build.properties file of bundle project '" + project.getName()
 									+ "': " + theCause.getMessage();
 						}
 					});
@@ -846,7 +846,7 @@ public class ProjectWrapper {
 				((IEditableModel) aBuildModel).save();
 			}
 			catch (CoreException theCause) {
-				this.errorMessage = "Could not build.properties file for bundle project '" + this.project.getName() + "': " + theCause.getMessage();
+				errorMessage = "Could not build.properties file for bundle project '" + project.getName() + "': " + theCause.getMessage();
 			}
 		}
 		return this;
@@ -857,7 +857,7 @@ public class ProjectWrapper {
 
 		if (!hasError()) {
 			try {
-				IFile aBuildPropertiesFile = PDEProject.getBuildProperties(this.project);
+				IFile aBuildPropertiesFile = PDEProject.getBuildProperties(project);
 				WorkspaceBuildModel aBuildModel = new WorkspaceBuildModel(aBuildPropertiesFile);
 				IBuildModelFactory aBuildModelFactory = aBuildModel.getFactory();
 
@@ -869,7 +869,7 @@ public class ProjectWrapper {
 							aAdditionalBundleBuildEntry.addToken(theAdditionalBundle);
 						}
 						catch (CoreException theCause) {
-							this.errorMessage = "Could add addition bundle '" + theAdditionalBundle + "' to build.properties file of bundle project '" + this.project.getName()
+							errorMessage = "Could add addition bundle '" + theAdditionalBundle + "' to build.properties file of bundle project '" + project.getName()
 									+ "': " + theCause.getMessage();
 						}
 					});
@@ -880,7 +880,7 @@ public class ProjectWrapper {
 				((IEditableModel) aBuildModel).save();
 			}
 			catch (CoreException theCause) {
-				this.errorMessage = "Could not build.properties file for bundle project '" + this.project.getName() + "': " + theCause.getMessage();
+				errorMessage = "Could not build.properties file for bundle project '" + project.getName() + "': " + theCause.getMessage();
 			}
 		}
 		return this;
@@ -889,10 +889,10 @@ public class ProjectWrapper {
 	public ProjectWrapper build() {
 		if (!hasError()) {
 			try {
-				this.project.build(IncrementalProjectBuilder.CLEAN_BUILD, null);
+				project.build(IncrementalProjectBuilder.CLEAN_BUILD, null);
 			}
 			catch (CoreException theCause) {
-				this.errorMessage = "Could not build project '" + this.project.getName() + "': " + theCause.getMessage();
+				errorMessage = "Could not build project '" + project.getName() + "': " + theCause.getMessage();
 			}
 		}
 		return this;
@@ -901,10 +901,10 @@ public class ProjectWrapper {
 	public ProjectWrapper refresh() {
 		if (!hasError()) {
 			try {
-				this.project.refreshLocal(IResource.DEPTH_INFINITE, null);
+				project.refreshLocal(IResource.DEPTH_INFINITE, null);
 			}
 			catch (CoreException theCause) {
-				this.errorMessage = "Could not refresh project '" + this.project.getName() + "': " + theCause.getMessage();
+				errorMessage = "Could not refresh project '" + project.getName() + "': " + theCause.getMessage();
 			}
 		}
 		return this;
@@ -914,12 +914,12 @@ public class ProjectWrapper {
 		verifyJavaProject();
 
 		if (!hasError()) {
-			IPackageFragmentRoot aSourceFolder = this.javaProject.getPackageFragmentRoot(this.project.getFolder(theFolder));
+			IPackageFragmentRoot aSourceFolder = javaProject.getPackageFragmentRoot(project.getFolder(theFolder));
 			try {
 				aSourceFolder.createPackageFragment(thePackage, true, null);
 			}
 			catch (JavaModelException theCause) {
-				this.errorMessage = "Could not create package '" + thePackage + "' in source folder '" + theFolder + "': " + theCause.getMessage();
+				errorMessage = "Could not create package '" + thePackage + "' in source folder '" + theFolder + "': " + theCause.getMessage();
 			}
 		}
 		return this;
@@ -932,16 +932,16 @@ public class ProjectWrapper {
 
 		if (!hasError()) {
 			try {
-				IPackageFragmentRoot[] allPackageFragmentRoots = this.javaProject.getAllPackageFragmentRoots();
+				IPackageFragmentRoot[] allPackageFragmentRoots = javaProject.getAllPackageFragmentRoots();
 
 				for (IPackageFragmentRoot aPackageFragmentRoot : allPackageFragmentRoots) {
-					if (aPackageFragmentRoot.getKind() == IPackageFragmentRoot.K_SOURCE && aPackageFragmentRoot.getParent().getElementName().equals(this.project.getName())) {
+					if (aPackageFragmentRoot.getKind() == IPackageFragmentRoot.K_SOURCE && aPackageFragmentRoot.getParent().getElementName().equals(project.getName())) {
 						allSourcePackages.addAll(getSourcePackages(aPackageFragmentRoot));
 					}
 				}
 			}
 			catch (JavaModelException theCause) {
-				this.errorMessage = "Could not extract source packages for project '" + this.project.getName() + theCause.getMessage();
+				errorMessage = "Could not extract source packages for project '" + project.getName() + theCause.getMessage();
 			}
 		}
 
@@ -970,16 +970,16 @@ public class ProjectWrapper {
 
 		if (!hasError()) {
 			try {
-				IPackageFragmentRoot[] allPackageFragmentRoots = this.javaProject.getAllPackageFragmentRoots();
+				IPackageFragmentRoot[] allPackageFragmentRoots = javaProject.getAllPackageFragmentRoots();
 
 				for (IPackageFragmentRoot aPackageFragmentRoot : allPackageFragmentRoots) {
-					if (aPackageFragmentRoot.getKind() == IPackageFragmentRoot.K_SOURCE && aPackageFragmentRoot.getParent().getElementName().equals(this.project.getName())) {
+					if (aPackageFragmentRoot.getKind() == IPackageFragmentRoot.K_SOURCE && aPackageFragmentRoot.getParent().getElementName().equals(project.getName())) {
 						allImportedPackages.addAll(getImportedPackages(aPackageFragmentRoot));
 					}
 				}
 			}
 			catch (JavaModelException theCause) {
-				this.errorMessage = "Could not extract imported packages for project '" + this.project.getName() + theCause.getMessage();
+				errorMessage = "Could not extract imported packages for project '" + project.getName() + theCause.getMessage();
 			}
 		}
 
@@ -1022,33 +1022,33 @@ public class ProjectWrapper {
 	}
 
 	private void verifyJavaProject() {
-		if (!hasError() && this.javaProject == null) {
-			this.errorMessage = "project '" + this.project.getName() + "' is not a Java project";
+		if (!hasError() && javaProject == null) {
+			errorMessage = "project '" + project.getName() + "' is not a Java project";
 		}
 	}
 
 	public boolean hasError() {
-		return this.errorMessage != null;
+		return errorMessage != null;
 	}
 
 	public String getErrorMessage() {
-		return this.errorMessage;
+		return errorMessage;
 	}
 
 	private void addProtocolMessage(String theMessage) {
-		if (this.protocolMessage == null) {
-			this.protocolMessage = theMessage;
+		if (protocolMessage == null) {
+			protocolMessage = theMessage;
 		}
 		else {
-			this.protocolMessage += "\n" + theMessage;
+			protocolMessage += "\n" + theMessage;
 		}
 	}
 
 	public boolean hasProtocol() {
-		return this.protocolMessage != null;
+		return protocolMessage != null;
 	}
 
 	public String getProtocolMessage() {
-		return this.protocolMessage;
+		return protocolMessage;
 	}
 }

@@ -28,41 +28,41 @@ public class TestFragmentCreator {
 		new TestFragmentCreator(theProject, theTestTypes).create(theTestClassPathEntries);
 	}
 
-	public TestFragmentCreator(IProject theProject, List<String> theTestTypes) {
-		this.project = theProject;
-		this.testTypes = theTestTypes;
+	private TestFragmentCreator(IProject theProject, List<String> theTestTypes) {
+		project = theProject;
+		testTypes = theTestTypes;
 	}
 
 	private void create(List<IClasspathEntry> theTestClassPathEntries) {
-		IJavaProject aJavaProject = JavaCore.create(this.project);
+		IJavaProject aJavaProject = JavaCore.create(project);
 
 		if (theTestClassPathEntries.isEmpty()) {
 			return;
 		}
 
-		IWorkspace aWorkspace = this.project.getWorkspace();
-		String aTestProjectName = this.project.getName() + ".test";
+		IWorkspace aWorkspace = project.getWorkspace();
+		String aTestProjectName = project.getName() + ".test";
 		ProjectWrapper aTestProjectWrapper = ProjectWrapper.of(aWorkspace, aTestProjectName);
 
 		List<IClasspathEntry> allTestSourceClasspathEntries = theTestClassPathEntries.stream()
 				.filter(theEntry -> theEntry.getContentKind() == IPackageFragmentRoot.K_SOURCE && theEntry.getEntryKind() == IClasspathEntry.CPE_SOURCE)
 				.filter(
-						theEntry -> this.testTypes.contains(theEntry.getPath().removeFirstSegments(1).segment(0))
+						theEntry -> testTypes.contains(theEntry.getPath().removeFirstSegments(1).segment(0))
 								|| (theEntry.getPath().removeFirstSegments(1).segmentCount() > 1 && theEntry.getPath().removeFirstSegments(1).segment(0).equals("src")
-										&& this.testTypes.contains(theEntry.getPath().removeFirstSegments(1).segment(1))))
+										&& testTypes.contains(theEntry.getPath().removeFirstSegments(1).segment(1))))
 				.collect(Collectors.toList());
 
 		if (!aTestProjectWrapper.isExisting()) {
-			ProjectWrapper aProjectWrapper = ProjectWrapper.of(this.project);
+			ProjectWrapper aProjectWrapper = ProjectWrapper.of(project);
 
 			aProjectWrapper.asJavaProject();
 			allTestSourceClasspathEntries.forEach(theTestClaspathEntry -> aProjectWrapper.removeClasspathEntry(theTestClaspathEntry.getPath()));
 
-			createTestProject(this.project, allTestSourceClasspathEntries);
+			createTestProject(project, allTestSourceClasspathEntries);
 		}
 
 		else {
-			updateTestProject(this.project, allTestSourceClasspathEntries);
+			updateTestProject(project, allTestSourceClasspathEntries);
 		}
 	}
 
@@ -132,7 +132,7 @@ public class TestFragmentCreator {
 			}
 		}
 
-		FixProjectDefinition.run(aProjectWrapper);
+		FixProjectDefinition.run(aProjectWrapper, true);
 	}
 
 	private void updateTestProject(IProject theProject, List<IClasspathEntry> theTestSourceClasspathEntries) {
@@ -160,7 +160,7 @@ public class TestFragmentCreator {
 					.updateTestFragmentManifest(theProject, () -> aAdditionalConfig.additionalPackageDependencies, () -> Collections.emptySet(), Collections.emptyMap())
 					.updateBuildProperties(aAdditionalConfig.additionalBundles).refresh();
 
-			FixProjectDefinition.run(aProjectWrapper);
+			FixProjectDefinition.run(aProjectWrapper, true);
 		}
 	}
 }
