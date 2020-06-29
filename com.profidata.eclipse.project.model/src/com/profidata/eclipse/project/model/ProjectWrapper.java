@@ -110,7 +110,7 @@ public class ProjectWrapper {
 	}
 
 	public ProjectWrapper toJavaProject() {
-		if (!hasError()) {
+		if (!hasError() && hasNature(JavaCore.NATURE_ID)) {
 			addNature(JavaCore.NATURE_ID);
 			javaProject = JavaCore.create(project);
 		}
@@ -120,7 +120,9 @@ public class ProjectWrapper {
 	public ProjectWrapper asJavaProject() {
 		if (!hasError()) {
 			if (hasNature(JavaCore.NATURE_ID)) {
-				javaProject = JavaCore.create(project);
+				if (javaProject == null) {
+					javaProject = JavaCore.create(project);
+				}
 			}
 			else {
 				errorMessage = "Project '" + project.getName() + "' is no Java project";
@@ -462,6 +464,94 @@ public class ProjectWrapper {
 		}
 		catch (JavaModelException theCause) {
 			throw new RuntimeException(theCause);
+		}
+	}
+
+	public void sortClasspath() {
+		try {
+			List<IClasspathEntry> allClasspathEntries = new ArrayList<>(Arrays.asList(javaProject.getRawClasspath()));
+
+			allClasspathEntries.sort((theEntry1, theEntry2) -> {
+				switch (theEntry1.getEntryKind()) {
+					case IClasspathEntry.CPE_CONTAINER: {
+						switch (theEntry2.getEntryKind()) {
+							case IClasspathEntry.CPE_CONTAINER:
+								break;
+							default:
+								return -1;
+						}
+						break;
+					}
+
+					case IClasspathEntry.CPE_LIBRARY:
+						switch (theEntry2.getEntryKind()) {
+							case IClasspathEntry.CPE_CONTAINER:
+								return 1;
+							case IClasspathEntry.CPE_LIBRARY:
+								return 0;
+							default:
+								return -1;
+						}
+
+					case IClasspathEntry.CPE_PROJECT:
+						switch (theEntry2.getEntryKind()) {
+							case IClasspathEntry.CPE_CONTAINER:
+							case IClasspathEntry.CPE_LIBRARY:
+								return 1;
+							case IClasspathEntry.CPE_PROJECT:
+								return 0;
+							default:
+								return -1;
+						}
+
+					case IClasspathEntry.CPE_SOURCE:
+						switch (theEntry2.getEntryKind()) {
+							case IClasspathEntry.CPE_CONTAINER:
+							case IClasspathEntry.CPE_LIBRARY:
+							case IClasspathEntry.CPE_PROJECT:
+								return 1;
+							case IClasspathEntry.CPE_SOURCE:
+								return 0;
+							default:
+								return -1;
+						}
+
+					case IClasspathEntry.CPE_VARIABLE:
+						switch (theEntry2.getEntryKind()) {
+							case IClasspathEntry.CPE_CONTAINER:
+							case IClasspathEntry.CPE_LIBRARY:
+							case IClasspathEntry.CPE_PROJECT:
+							case IClasspathEntry.CPE_SOURCE:
+								return 1;
+							case IClasspathEntry.CPE_VARIABLE:
+								return 0;
+							default:
+								return -1;
+						}
+				}
+
+				// JUnit container is always first
+				if (theEntry1.getPath().toString().startsWith("org.eclipse.jdt.junit.JUNIT_CONTAINER")) {
+					return -1;
+				}
+				if (theEntry2.getPath().toString().startsWith("org.eclipse.jdt.junit.JUNIT_CONTAINER")) {
+					return 1;
+				}
+
+				// JRE container is always last
+				if (theEntry1.getPath().toString().startsWith("org.eclipse.jdt.launching.JRE_CONTAINER")) {
+					return 1;
+				}
+				if (theEntry2.getPath().toString().startsWith("org.eclipse.jdt.launching.JRE_CONTAINER")) {
+					return -1;
+				}
+
+				return 0;
+			});
+			javaProject.setRawClasspath(allClasspathEntries.toArray(new IClasspathEntry[allClasspathEntries.size()]), null);
+		}
+		catch (JavaModelException theCause) {
+			errorMessage = "Could not sort classpath entries of Java project '" + project.getName() + "': " + theCause.getMessage();
 		}
 	}
 

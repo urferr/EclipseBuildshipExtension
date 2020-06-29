@@ -41,17 +41,8 @@ public class FixProjectDefinition {
 		if (theAddJunitLibraryPath) {
 			addJUnitLibraryPath();
 		}
-	}
 
-	private void addJUnitLibraryPath() {
-		final IAccessRule[] NO_ACCESS_RULES = {};
-
-		String aJUnitLibraryPath = AdditionalProjectConfigurationDefinitionProvider.getInstance().findJUnitLibraryPath(project.getName());
-
-		if (aJUnitLibraryPath != null) {
-			IPath aContainerPath = Path.fromPortableString(aJUnitLibraryPath);
-			projectWrapper.addClasspathEntry(theProject -> JavaCore.newContainerEntry(aContainerPath, NO_ACCESS_RULES, null, false));
-		}
+		projectWrapper.sortClasspath();
 	}
 
 	private void setDefaultCharset() {
@@ -109,4 +100,16 @@ public class FixProjectDefinition {
 
 		return NO_ACCESS_RULES;
 	}
+
+	private void addJUnitLibraryPath() {
+		final IAccessRule[] NO_ACCESS_RULES = {};
+
+		String aJUnitLibraryPath = AdditionalProjectConfigurationDefinitionProvider.getInstance().findJUnitLibraryPath(project.getName());
+
+		if (aJUnitLibraryPath != null) {
+			IPath aContainerPath = Path.fromPortableString(aJUnitLibraryPath);
+			projectWrapper.addClasspathEntry(theProject -> JavaCore.newContainerEntry(aContainerPath, NO_ACCESS_RULES, null, false));
+		}
+	}
+
 }
