@@ -107,8 +107,10 @@ public class FixProjectDefinition {
 		String aJUnitLibraryPath = AdditionalProjectConfigurationDefinitionProvider.getInstance().findJUnitLibraryPath(project.getName());
 
 		if (aJUnitLibraryPath != null) {
-			IPath aContainerPath = Path.fromPortableString(aJUnitLibraryPath);
-			projectWrapper.addClasspathEntry(theProject -> JavaCore.newContainerEntry(aContainerPath, NO_ACCESS_RULES, null, false));
+			IPath aJunitContainerPath = Path.fromPortableString(aJUnitLibraryPath);
+			projectWrapper.addClasspathEntry(theProject -> JavaCore.newContainerEntry(aJunitContainerPath, NO_ACCESS_RULES, null, false));
+			IPath aHamcrestContainerPath = Path.fromPortableString("com.profidata.eclipse.HAMCREST_CONTAINER");
+			projectWrapper.addClasspathEntry(theProject -> JavaCore.newContainerEntry(aHamcrestContainerPath, NO_ACCESS_RULES, null, false));
 		}
 	}
 

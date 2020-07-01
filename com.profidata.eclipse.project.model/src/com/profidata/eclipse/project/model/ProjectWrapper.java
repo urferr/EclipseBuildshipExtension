@@ -110,7 +110,7 @@ public class ProjectWrapper {
 	}
 
 	public ProjectWrapper toJavaProject() {
-		if (!hasError() && hasNature(JavaCore.NATURE_ID)) {
+		if (!hasError()) {
 			addNature(JavaCore.NATURE_ID);
 			javaProject = JavaCore.create(project);
 		}
@@ -530,19 +530,27 @@ public class ProjectWrapper {
 						}
 				}
 
-				// JUnit container is always first
-				if (theEntry1.getPath().toString().startsWith("org.eclipse.jdt.junit.JUNIT_CONTAINER")) {
+				// Hamcrest container is always first
+				if (theEntry1.getPath().segment(0).equals("com.profidata.eclipse.HAMCREST_CONTAINER")) {
 					return -1;
 				}
-				if (theEntry2.getPath().toString().startsWith("org.eclipse.jdt.junit.JUNIT_CONTAINER")) {
+				if (theEntry2.getPath().segment(0).equals("com.profidata.eclipse.HAMCREST_CONTAINER")) {
+					return 1;
+				}
+
+				// Hamcrest container is always second
+				if (theEntry1.getPath().segment(0).equals("org.eclipse.jdt.junit.JUNIT_CONTAINER")) {
+					return -1;
+				}
+				if (theEntry2.getPath().segment(0).equals("org.eclipse.jdt.junit.JUNIT_CONTAINER")) {
 					return 1;
 				}
 
 				// JRE container is always last
-				if (theEntry1.getPath().toString().startsWith("org.eclipse.jdt.launching.JRE_CONTAINER")) {
+				if (theEntry1.getPath().segment(0).equals("org.eclipse.jdt.launching.JRE_CONTAINER")) {
 					return 1;
 				}
-				if (theEntry2.getPath().toString().startsWith("org.eclipse.jdt.launching.JRE_CONTAINER")) {
+				if (theEntry2.getPath().segment(0).equals("org.eclipse.jdt.launching.JRE_CONTAINER")) {
 					return -1;
 				}
 
