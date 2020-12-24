@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Profidata Eclipse Enhancements
+Bundle-SymbolicName: com.profidata.eclipse.enhancements;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Profidata AG
+Automatic-Module-Name: com.profidata.eclipse.enhancements
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Import-Package: org.eclipse.core.runtime,
+ org.eclipse.jdt.core,
+ org.eclipse.jdt.internal.junit,
+ org.eclipse.jdt.internal.junit.buildpath,
+ org.eclipse.osgi.service.resolver
