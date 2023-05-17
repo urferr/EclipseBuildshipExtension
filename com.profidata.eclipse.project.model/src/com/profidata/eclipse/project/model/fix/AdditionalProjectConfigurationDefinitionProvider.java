@@ -68,7 +68,10 @@ public class AdditionalProjectConfigurationDefinitionProvider {
 	public String findJUnitLibraryPath(String theProjectName) {
 		AdditionalProjectConfigurations allConfigurations = projectConfigurationDefinitions;
 
-		return allConfigurations.junitLibraryPath;
+		if (allConfigurations != null) {
+			return allConfigurations.junitLibraryPath;
+		}
+		return null;
 	}
 
 	public ProjectConfiguration find(String theProjectName) {
