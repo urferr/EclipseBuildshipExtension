@@ -78,7 +78,7 @@ public aspect SynchronizeGradleBuildOperationAspect {
 
 			// check if there are folders containing test classes generate corresponding fragment for it.
 			if (!theProject.getName().endsWith("-integration")) {
-					TestFragmentCreator.run(theWorkspaceProject, Arrays.asList("test", "integration", "manual"), onlyTestClasspathEntries(theWorkspaceProject, ImmutableList.copyOf(theProject.getSourceDirectories())));
+					TestFragmentCreator.run(theWorkspaceProject, Arrays.asList("test", "integration", "manual", "moduleTest"), onlyTestClasspathEntries(theWorkspaceProject, ImmutableList.copyOf(theProject.getSourceDirectories())));
 			}
 		}
 

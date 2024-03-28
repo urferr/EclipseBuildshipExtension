@@ -6,7 +6,7 @@ Bundle-Version: 3.0.0.qualifier
 Bundle-Vendor: Profidata AG
 Bundle-Activator: com.profidata.eclipse.project.model.Activator
 Automatic-Module-Name: com.profidata.eclipse.project.model
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Export-Package: com.profidata.eclipse.project.model,
  com.profidata.eclipse.project.model.fix
 Import-Package: com.google.gson,

@@ -4,7 +4,7 @@ Bundle-Name: Eclipse Buildship Enhancements
 Bundle-SymbolicName: com.profidata.eclipse.buildship.enhancements
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.profidata.eclipse.buildship.enhancements.Activator
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Require-Bundle: org.aspectj.runtime;bundle-version="1.7.0";visibility:=reexport,
  org.eclipse.buildship.core;bundle-version="[3.0.0,4.0.0)",
  org.gradle.toolingapi;bundle-version="[4.8.0,10.0.0)",
