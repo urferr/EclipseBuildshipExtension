@@ -779,7 +779,12 @@ public class ProjectWrapper {
 				aBundleFragment.setVersion("0.0.0");
 				aBundleFragment.setProviderName("Reto Urfer (Profidata AG)");
 
-				aBundleFragment.setPluginId(theHostBundleProject.getName());
+				if (aHostBundleProjectWrapper.isFragment()) {
+					aBundleFragment.setPluginId(aHostBundleProjectWrapper.getFragmentHostId());
+				}
+				else {
+					aBundleFragment.setPluginId(theHostBundleProject.getName());
+				}
 
 				aBundle.setHeader(Constants.BUNDLE_REQUIREDEXECUTIONENVIRONMENT, theExecutionEnvironment);
 
