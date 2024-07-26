@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.aspectj.lang.annotation.SuppressAjWarnings;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -27,6 +28,11 @@ import com.profidata.eclipse.project.model.fix.IgnoreProjectFolder;
 import com.profidata.eclipse.project.model.fix.TestFragmentCreator;
 
 public aspect SynchronizeGradleBuildOperationAspect {
+	private final boolean isAbsoluteSourcePath;
+
+	public SynchronizeGradleBuildOperationAspect() {
+		isAbsoluteSourcePath =  Boolean.valueOf( System.getProperty("extension.buildship.absolute.source.path", "false"));
+	}
 
 	/**
 	 * Prevent gradle nature to added to a plugin project (plugin nature)
@@ -57,7 +63,7 @@ public aspect SynchronizeGradleBuildOperationAspect {
 				aProjectWrapper.asJavaProject();
 				FixProjectDefinition.run(aProjectWrapper);
 			}
-			else if (aProjectWrapper.hasNature(JavaCore.NATURE_ID)){
+			else if (aProjectWrapper.hasNature(JavaCore.NATURE_ID)) {
 				aProjectWrapper.asJavaProject();
 				FixProjectDefinition.run(aProjectWrapper, true);
 			}
@@ -78,7 +84,8 @@ public aspect SynchronizeGradleBuildOperationAspect {
 
 			// check if there are folders containing test classes generate corresponding fragment for it.
 			if (!theProject.getName().endsWith("-integration")) {
-					TestFragmentCreator.run(theWorkspaceProject, Arrays.asList("test", "integration", "manual", "moduleTest"), onlyTestClasspathEntries(theWorkspaceProject, ImmutableList.copyOf(theProject.getSourceDirectories())));
+				TestFragmentCreator
+						.run(theWorkspaceProject, Arrays.asList("test", "integration", "manual", "moduleTest"),isAbsoluteSourcePath, onlyTestClasspathEntries(theWorkspaceProject, ImmutableList.copyOf(theProject.getSourceDirectories())));
 			}
 		}
 
@@ -106,7 +113,7 @@ public aspect SynchronizeGradleBuildOperationAspect {
 
 	private List<EclipseSourceDirectory> withoutTestSourceDirectories(List<EclipseSourceDirectory> theSourceDirectories) {
 		return theSourceDirectories.stream()
-				.filter(theSourceDirectory -> isSourceDirectory(theSourceDirectory) )
+				.filter(theSourceDirectory -> isSourceDirectory(theSourceDirectory))
 				.collect(Collectors.toList());
 	}
 
@@ -117,9 +124,10 @@ public aspect SynchronizeGradleBuildOperationAspect {
 				.map(thePath -> JavaCore.newSourceEntry(thePath))
 				.collect(Collectors.toList());
 	}
-	
+
 	private boolean isSourceDirectory(EclipseSourceDirectory theSourceDirectory) {
-		return theSourceDirectory.getPath().equals("src") || theSourceDirectory.getPath().equals("resources") || theSourceDirectory.getPath().startsWith("src/main") || theSourceDirectory.getPath().startsWith("src/generated");
+		return theSourceDirectory.getPath().equals("src") || theSourceDirectory.getPath().equals("resources") || theSourceDirectory.getPath().startsWith("src/main")
+				|| theSourceDirectory.getPath().startsWith("src/generated");
 	}
 
 }

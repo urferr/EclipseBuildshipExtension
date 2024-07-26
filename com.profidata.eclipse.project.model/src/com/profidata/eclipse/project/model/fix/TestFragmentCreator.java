@@ -23,14 +23,16 @@ public class TestFragmentCreator {
 
 	private final IProject project;
 	private final List<String> testTypes;
+	private final boolean isAbsolutSourcePath;
 
-	public static void run(IProject theProject, List<String> theTestTypes, List<IClasspathEntry> theTestClassPathEntries) {
-		new TestFragmentCreator(theProject, theTestTypes).create(theTestClassPathEntries);
+	public static void run(IProject theProject, List<String> theTestTypes, boolean theAbsolutSourcePath, List<IClasspathEntry> theTestClassPathEntries) {
+		new TestFragmentCreator(theProject, theTestTypes, theAbsolutSourcePath).create(theTestClassPathEntries);
 	}
 
-	private TestFragmentCreator(IProject theProject, List<String> theTestTypes) {
+	private TestFragmentCreator(IProject theProject, List<String> theTestTypes, boolean theAbsolutSourcePath) {
 		project = theProject;
 		testTypes = theTestTypes;
+		isAbsolutSourcePath = theAbsolutSourcePath;
 	}
 
 	private void create(List<IClasspathEntry> theTestClassPathEntries) {
@@ -91,11 +93,10 @@ public class TestFragmentCreator {
 
 			IPath aProjectLocation = theProject.getLocation();
 			for (IClasspathEntry aTestSourceClasspathEntry : theTestSourceClasspathEntries) {
-				IPath aRelativeProjectLocation = aProjectLocation.makeRelativeTo(aWorkspaceLocation);
 				IPath aSourcePath = aTestSourceClasspathEntry.getPath();
-				IPath aSourceLocation = new Path("WORKSPACE_LOC").append(aRelativeProjectLocation).append(aSourcePath.removeFirstSegments(1));
 				String aSourceType = aSourcePath.lastSegment();
 				String aTestType = aSourcePath.removeLastSegments(1).lastSegment();
+				IPath aSourceLocation = getSourceLocation(aWorkspaceLocation, aProjectLocation, aSourcePath);
 
 				aProjectWrapper.addLinkedSourceFolder(aTestType + "-" + aSourceType, aSourceLocation);
 			}
@@ -146,11 +147,10 @@ public class TestFragmentCreator {
 			IPath aWorkspaceLocation = theProject.getWorkspace().getRoot().getLocation();
 			IPath aProjectLocation = theProject.getLocation();
 			for (IClasspathEntry aTestSourceClasspathEntry : theTestSourceClasspathEntries) {
-				IPath aRelativeProjectLocation = aProjectLocation.makeRelativeTo(aWorkspaceLocation);
 				IPath aSourcePath = aTestSourceClasspathEntry.getPath();
-				IPath aSourceLocation = new Path("WORKSPACE_LOC").append(aRelativeProjectLocation).append(aSourcePath.removeFirstSegments(1));
 				String aSourceType = aSourcePath.lastSegment();
 				String aTestType = aSourcePath.removeLastSegments(1).lastSegment();
+				IPath aSourceLocation = getSourceLocation(aWorkspaceLocation, aProjectLocation, aSourcePath);
 
 				aProjectWrapper.addLinkedSourceFolder(aTestType + "-" + aSourceType, aSourceLocation);
 			}
@@ -161,6 +161,18 @@ public class TestFragmentCreator {
 					.updateBuildProperties(aAdditionalConfig.additionalBundles).refresh();
 
 			FixProjectDefinition.run(aProjectWrapper, true);
+		}
+	}
+
+	private IPath getSourceLocation(IPath theWorkspaceLocation, IPath theProjectLocation, IPath theSourcePath) {
+
+		if (isAbsolutSourcePath) {
+			return theProjectLocation.append(theSourcePath.removeFirstSegments(1));
+		}
+		else {
+			IPath aRelativeProjectLocation = theProjectLocation.makeRelativeTo(theWorkspaceLocation);
+
+			return new Path("WORKSPACE_LOC").append(aRelativeProjectLocation).append(theSourcePath.removeFirstSegments(1));
 		}
 	}
 }
