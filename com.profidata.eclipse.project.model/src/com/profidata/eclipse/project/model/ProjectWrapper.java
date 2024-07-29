@@ -876,14 +876,14 @@ public class ProjectWrapper {
 		// the may have additional attributes defined
 		allImportedPackages.removeAll(someAdditionalPackageDependencies.stream().map(thePackageDependency -> thePackageDependency.split(";", 2)[0]).collect(Collectors.toSet()));
 
-		// add all the additional packages defined with there attributes
-		allImportedPackages.addAll(someAdditionalPackageDependencies);
-
 		// remove all the packages defined in the host bundle
 		allImportedPackages.removeAll(theSourcePackages);
 
 		// remove all the packages defined in this test fragment
 		allImportedPackages.removeAll(getSourcePackages());
+
+		// add all the additional packages defined with there attributes
+		allImportedPackages.addAll(someAdditionalPackageDependencies);
 
 		// remove all the packages defined as to be ignored
 		Set<String> someIgnoredPackages = new HashSet<>();
